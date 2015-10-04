@@ -41,7 +41,6 @@ int main(int argc, char* argv[]) {
 
     // Read and show in a window lena
     Mat im = imread("./lena.jpg", 1);
-//    grid16(im);
     vector<Point> a = points9(im);
     drawCross(im, a);
     showImage(im);
@@ -67,6 +66,13 @@ int main(int argc, char* argv[]) {
     vector<Point> b = points9(ball);
     drawCross(ball, b);
     showImage(ball);
+    
+    // Read Lena again, converted it to grayscale and then show the points
+    //    grid16(im);
+    Mat lenna = imread("./lena.jpg", IMREAD_GRAYSCALE);
+    vector<Point> c = points9(lenna);
+    drawCross(lenna, c);
+    showImage(lenna);
     
     return 0;
 }
