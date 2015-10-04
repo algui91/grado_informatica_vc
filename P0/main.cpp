@@ -39,10 +39,13 @@ vector<Point> points9(Mat &m);
 
 int main(int argc, char* argv[]) {
 
+    srand(time(NULL));
+    
     // Read and show in a window lena
     Mat im = imread("./lena.jpg", 1);
     vector<Point> a = points9(im);
     drawCross(im, a);
+    grid16(im);
     showImage(im);
     showInfo(im);
 
@@ -65,15 +68,15 @@ int main(int argc, char* argv[]) {
     Mat ball = imread("./ball.png", IMREAD_COLOR);
     vector<Point> b = points9(ball);
     drawCross(ball, b);
+    grid16(ball);
     showImage(ball);
-    
+
     // Read Lena again, converted it to grayscale and then show the points
-    //    grid16(im);
     Mat lenna = imread("./lena.jpg", IMREAD_GRAYSCALE);
     vector<Point> c = points9(lenna);
     drawCross(lenna, c);
     showImage(lenna);
-    
+
     return 0;
 }
 
@@ -103,19 +106,19 @@ void drawCross(Mat &m, vector<Point> &points) {
             Point cross(points.at(i).x - 2, points.at(i).y);
 
             // Draw line from a to a.x-2, a.y
-            line(m, a, cross, CV_RGB(0, 255, 0));
+            line(m, a, cross, CV_RGB(255, 0, 0), 1, LINE_AA);
             cross.x += 2;
             cross.y += 2;
             // Draw line from a to a.x, a.y+2
-            line(m, a, cross, CV_RGB(0, 255, 0));
+            line(m, a, cross, CV_RGB(255, 0, 0), 1, LINE_AA);
             cross.x += 2;
             cross.y -= 2;
             // Draw line from a to a.x+2, a.y
-            line(m, a, cross, CV_RGB(0, 255, 0));
+            line(m, a, cross, CV_RGB(255, 0, 0), 1, LINE_AA);
             cross.x -= 2;
             cross.y -= 2;
             // Draw line from a to a.x, a.y-2
-            line(m, a, cross, CV_RGB(0, 255, 0));
+            line(m, a, cross, CV_RGB(255, 0, 0), 1, LINE_AA);
         }
     }
 }
@@ -124,8 +127,8 @@ vector<Point> points9(Mat &m) {
     vector<Point> points;
 
     if (!m.empty()) {
-        float xdivisor = m.cols / 4;
-        float ydivisor = m.rows / 4;
+        int xdivisor = m.cols / 4;
+        int ydivisor = m.rows / 4;
         int x = xdivisor;
         int y = ydivisor;
 
@@ -145,15 +148,15 @@ vector<Point> points9(Mat &m) {
 void grid16(Mat &m) {
 
     if (!m.empty()) {
-        int splitrows = m.rows / 4;
         int splitcols = m.cols / 4;
+        int splitrows = m.rows / 4;
         int initialx = 0;
         int initialy = 0;
 
         for (int i = 0; i < 4; i++) {
             for (int k = 0; k < 4; k++) {
-                Mat rec(m, Rect(initialx, initialy, splitrows, splitcols));
-                rec = rec * (k + 1)*(i + 1) - (k + 1)*(i + 1);
+                Mat rec(m, Rect(initialx, initialy, splitcols, splitrows));
+                rec = rec * (rand() % 4 + 1) - (rand() % 64);
                 initialx += splitcols;
             }
             initialx = 0;
