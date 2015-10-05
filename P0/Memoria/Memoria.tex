@@ -178,6 +178,8 @@ Por último, las images a color necesitan tres canales (RGB) para representar el
 \miit{¿Es posible realizar operaciones entre imágenes de
 distinto tipo visual? Justificar la respuesta}\\
 
+No. Ya que la estructura interna de la matriz no coincide. No se puede por ejemplo, sumar un elemento de una imagen de 32 bits y 3 canales con otra de 8 bits y un canal. Sí que se puede convertir una de ellas al tipo de la otra, y entonces operar. Por ejemplo, dadas una \cppinline/Mat/ de \cppinline/8UC1/ y otra de \cppinline/32SC3/. Si copiamos una a la otra, con \cppinline/copyTo()/, se trasformarán los tipos adecuadamente.
+
 \section{Questión 5}
 
 \miit{¿Cuál es la orden OpenCV que permite transformar el

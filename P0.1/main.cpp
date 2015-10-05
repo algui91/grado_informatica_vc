@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     grid16(im);
     showImage(im);
     showInfo(im);
-
+    
     Mat im2 = imread("./ball.png", IMREAD_COLOR);
     // Create a ROI
     Mat roi(im2, Rect(0, 0, im.rows, im.cols));
