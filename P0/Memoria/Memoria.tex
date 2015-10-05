@@ -1,0 +1,194 @@
+%%% LaTeX Template: Two column article
+%%%
+%%% Source: http://www.howtotex.com/
+%%% Feel free to distribute this template, but please keep to referal to http://www.howtotex.com/ here.
+%%% Date: February 2011
+
+%%% Preamble
+\documentclass[	DIV=calc,%
+							paper=a4,%
+							fontsize=11pt]{scrartcl}	 					% KOMA-article class
+
+\usepackage[spanish]{babel}										% English language/hyphenation
+\usepackage[protrusion=true,expansion=true]{microtype}				% Better typography
+\usepackage{amsmath,amsfonts,amsthm}					% Math packages
+%\usepackage[pdftex]{graphicx}									% Enable pdflatex
+\usepackage[svgnames]{xcolor}									% Enabling colors by their 'svgnames'
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption}	% Custom captions under/above floats
+\usepackage{epstopdf}												% Converts .eps to .pdf
+\usepackage{subfig}													% Subfigures
+\usepackage{booktabs}												% Nicer tables
+\usepackage{fix-cm}													% Custom fontsizes
+\usepackage{hyperref}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[light,math]{kurier}
+
+
+%%% Custom sectioning (sectsty package)
+\usepackage{sectsty}													% Custom sectioning (see below)
+\allsectionsfont{%															% Change font of al section commands
+	\usefont{T1}{mdugm}{b}{it}%										% bch-b-n: CharterBT-Bold font
+	}
+
+\sectionfont{%																% Change font of \section command
+	\usefont{T1}{mdugm}{b}{it}%										% bch-b-n: CharterBT-Bold font
+	}
+
+%%% Headers and footers
+\usepackage{fancyhdr}												% Needed to define custom headers/footers
+	\pagestyle{fancy}														% Enabling the custom headers/footers
+\usepackage{lastpage}
+
+% Header (empty)
+\lhead{}
+\chead{}
+\rhead{}
+% Footer (you may change this to your own needs)
+\lfoot{\footnotesize \miit{Alejandro Alcalde Barros} \textbullet ~}
+\cfoot{}
+\rfoot{\footnotesize Página \thepage\ de \pageref{LastPage}}	% "Page 1 of 2"
+\renewcommand{\headrulewidth}{0.0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+
+
+%%% Creating an initial of the very first character of the content
+\usepackage{lettrine}
+\newcommand{\initial}[1]{%
+     \lettrine[lines=3,lhang=0.3,nindent=0em]{
+     				\color{DarkGoldenrod}
+     				{\textsf{#1}}}{}}
+
+
+
+%%% Title, author and date metadata
+\usepackage{titling}															% For custom titles
+
+\newcommand{\HorRule}{\color{DarkGoldenrod}%			% Creating a horizontal rule
+									  	\rule{\linewidth}{1pt}%
+										}
+
+\pretitle{\vspace{-30pt} \begin{flushleft} \HorRule
+				\fontsize{50}{50} \usefont{T1}{kurier}{l}{it} \color{DarkRed} \selectfont
+				}
+\title{VC P0: Introducción a OpenCV}					% Title of your article goes here
+\posttitle{\par\end{flushleft}\vskip 0.5em}
+
+\preauthor{\begin{flushleft}
+					\large \lineskip 0.5em \usefont{T1}{mdugm}{m}{it} \color{DarkRed}}
+\author{Alejandro Alcalde,}											% Author name goes here
+\postauthor{\footnotesize \usefont{OT1}{mdugm}{m}{it} \color{Black}
+					Universidad de Granada 								% Institution of author
+					\par\end{flushleft}\HorRule}
+
+\date{\usefont{T1}{mdugm}{b}{it}\selectfont\today}																				% No date
+
+\newcommand{\miit}[1]{{\usefont{T1}{mdugm}{m}{it}\selectfont #1}}
+
+\usepackage{minted}
+
+\newminted{bash}{
+		numbersep=5pt,
+		autogobble=true,
+		frame=lines,
+		framesep=2mm,
+		fontsize=\scriptsize,
+		tabsize=2,
+		fontfamily=DejaVuSansMono-TLF,
+}
+
+\newminted{cpp}{
+		numbersep=5pt,
+		autogobble=true,
+		frame=lines,
+		framesep=2mm,
+		fontsize=\scriptsize,
+		tabsize=2,
+		fontfamily=DejaVuSansMono-TLF,
+}
+
+\newmintedfile[myCpp]{cpp}{
+    linenos,
+    numbersep=5pt,
+		autogobble=true,
+    frame=lines,
+    framesep=2mm,
+    fontsize=\scriptsize,
+		tabsize=2,
+		fontfamily=DejaVuSansMono-TLF,
+}
+
+\newcommand{\cppf}[2]{
+    \myCpp[label=#2]{#1}
+}
+
+\newmintinline{cpp}{fontsize=\scriptsize, fontfamily=DejaVuSansMono-TLF}
+
+%%% Begin document
+\begin{document}
+\maketitle
+\thispagestyle{fancy} 			% Enabling the custom headers/footers for the first page
+% The first character should be within \initial{}
+
+\section{Questión 1}
+
+\miit{¿Qué relación hay en OpenCV entre imágenes y
+matrices? Justificar la respuesta}\\
+
+Las matrices representan la información de una imagen. Son un \textit{array} numérico n-dimensional de uno (Blanco y negro) o varios (color) canales. Pueden declararse de varios tipos, si la imagen es en blanco y negro, podría usarse una representación \cppinline/unigned int/  de un canal para imágenes en blanco y negro. Ésta representación viene dada en \textit{OpenCV} por la constante \cppinline/CV_8UC1/. Una matriz declarada de este modo representa una imagen en la que cada pixel está formado por un \cppinline/unsigned int/ (8 bits), y un canal (Blanco y negro).
+
+\section{Questión 2}
+
+\miit{Diga el significado de los siguientes tipos OpenCV:
+8UC1, 8UC2, 8UC3, 32SC1, 32SC2, 32SC3, 32FC1,
+32FC2, 32FC3. ¿Cuáles de ellos están asociados a
+imágenes? Justificar la respuesta.}\\
+
+\begin{itemize}
+	\item[\cppinline/8UC1/:] Los elementos de la matriz son 8 bits \cppinline/unsigned/, con un solo canal.
+	\item[\cppinline/8UC2/:] Elementos de 8 bits \cppinline/unsigned/, dos canales.
+	\item[\cppinline/8UC3/:] Elementos de 8 bits \cppinline/unsigned/, tres canales.
+	\item[\cppinline/32SC1/:] Elementos de 32 bits \cppinline/signed/, un canal.
+	\item[\cppinline/32SC2/:] Elementos de 32 bits \cppinline/signed/, dos canales.
+	\item[\cppinline/32SC3/:] Elementos de 32 bits \cppinline/signed/, tres canales.
+	\item[\cppinline/32FC1/:] Elementos de 32 bits \cppinline/float/, un canal.
+	\item[\cppinline/32FC2/:] Elementos de 32 bits \cppinline/float/, dos canales.
+	\item[\cppinline/32FC3/:] Elementos de 32 bits \cppinline/float/, tres canales.
+\end{itemize}
+
+
+En principio todas podrían asociarse con imágenes. La diferencia entre los distintos tipos radicaría esencialmente en el canal. 1 canal para blanco y negro, 2 para escala de grises y 3 para color. Y la profundidad de color (8 bits, 16 bits y 32.)
+
+\section{Questión 3}
+
+\miit{¿Qué relación existe entre cada tipo visual de una
+imagen: (color, grises, blanco y negro) y los tipos de
+almacenamiento de OpenCV ? Justificar la respuesta}\\
+
+Comencemos por las imágenes en blanco y negro. Para dichas imágenes únicamente es necesario un canal, ya que un pixel podrá ser o blanco o negro. En cuanto a su representación en opencv, bastaría con tener un tipo \cppinline/2UC1/ o algo parecido, ya que solo necesitamos un bit para cada pixel. Un pixel negro sería el 0, blanco el 1, con un solo canal. Dado que este tipo no existe, una imagen en blanco y negro podría representarse en OpenCV con los tipos \cppinline/8UC1, 32SC1, 32FC1/.
+
+Las imágenes a escala de grises se representan usando dos canales, aquí en lugar de tener dos posibles valores, se dispone de un rango de valores desde el blanco al negro. Los tipos que representan este tipo de imágen son  \cppinline/8UC2, 32SC2, 32FC2/.
+
+Por último, las images a color necesitan tres canales (RGB) para representar el color del píxel. El color del pixel se obtiene mediante la combinación de los niveles de {\color{red} Red}, {\color{green} Green}, y {\color{blue} Blue}. Los tipos que se pueden usar en OpenCv para este tipo de imágenes son \cppinline{8UC3, 32SUC3, 32FC3}.
+
+\section{Questión 4}
+
+\miit{¿Es posible realizar operaciones entre imágenes de
+distinto tipo visual? Justificar la respuesta}\\
+
+\section{Questión 5}
+
+\miit{¿Cuál es la orden OpenCV que permite transformar el
+tipo de almacenamiento de una matriz en otro distinto?}\\
+
+\section{Questión 6}
+
+\miit{¿Cuál es la orden OpenCV que permite transformar el
+tipo visual de una imagen en otro distinto? ¿Por qué es
+distinta de la que transforma un tipo de almacenamiento
+en otro?}\\
+
+
+\end{document}
