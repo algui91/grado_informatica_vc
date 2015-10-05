@@ -185,6 +185,10 @@ No. Ya que la estructura interna de la matriz no coincide. No se puede por ejemp
 \miit{¿Cuál es la orden OpenCV que permite transformar el
 tipo de almacenamiento de una matriz en otro distinto?}\\
 
+La función \cppinline/void cv::Mat::convertTo()/ es la más indicada para este trabajo, aunque es posible cambiar el tipo de la matriz también con \cppinline/create/. Veamos a continuación cómo podríamos  usarlas, supongamos que tenemos una matriz \cppinline/m/ de tipo \cppinline/8UC1/ declarada \cppinline/Mat m(100, 100, CV_8UC1)/ y queremos pasarla a \cppinline/8UC3/:
+
+Con \cppinline/convertTo()/ bastaría hacer \cppinline/m.convertTo(m, CV_8UC3)/ y con \cppinline/create/ haríamos \cppinline/m.create(100, 100, CV_8UC3)/.
+
 \section{Questión 6}
 
 \miit{¿Cuál es la orden OpenCV que permite transformar el
