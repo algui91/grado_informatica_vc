@@ -199,5 +199,25 @@ en otro?}\\
 La función es \cppinline/cvtColor/. Digamos que es una función auxiliar de creación de Matrices, las que hemos visto hasta ahora (\cppinline/create y convertTo/) son más generales. A \cppinline/cvtColor/ se le pasa como parámetro la matriz/imagen origen, la destino y el tipo al que se quiere comvertir (RGB, Grayscale etc), internamente \cppinline/cvtColor/ se encargará de llamar a \cppinline/create/ con el nuevo tipo. Si se investiga el código de esta función, se puede observar que efectivamente es así (\cppinline/_dst.create( sz, CV_MAKETYPE(depth, dcn))/). Donde \cppinline/_dst/ es la matriz de destino.
 
 
+\section{Ejercicio 1}
+
+\miit{Escribir una función que lea una imagen en niveles de gris o en
+color ( im=leeimagen(filename, flagColor))}\\
+
+\section{Ejercicio 2}
+
+\miit{Escribir una función que visualice una imagen (pintaI(im))}\\
+
+\section{Ejercicio 3}
+
+\miit{Escribir una función que visualice varias imágenes a la vez:
+pintaMI(vim). (vim será una secuencia de imágenes) ¿Qué pasa
+si las imágenes no son todas del mismo tipo: (nivel de gris, color,
+blanco-negro)?}\\
+
+\section{Ejercicio 4}
+
+\miit{Escribir una función que modifique el valor en una imagen de una
+lista de coordenadas de píxeles.}\\
 
 \end{document}
