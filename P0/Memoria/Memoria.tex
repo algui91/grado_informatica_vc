@@ -196,5 +196,8 @@ tipo visual de una imagen en otro distinto? ¿Por qué es
 distinta de la que transforma un tipo de almacenamiento
 en otro?}\\
 
+La función es \cppinline/cvtColor/. Digamos que es una función auxiliar de creación de Matrices, las que hemos visto hasta ahora (\cppinline/create y convertTo/) son más generales. A \cppinline/cvtColor/ se le pasa como parámetro la matriz/imagen origen, la destino y el tipo al que se quiere comvertir (RGB, Grayscale etc), internamente \cppinline/cvtColor/ se encargará de llamar a \cppinline/create/ con el nuevo tipo. Si se investiga el código de esta función, se puede observar que efectivamente es así (\cppinline/_dst.create( sz, CV_MAKETYPE(depth, dcn))/). Donde \cppinline/_dst/ es la matriz de destino.
+
+
 
 \end{document}
