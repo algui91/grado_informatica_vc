@@ -38,5 +38,20 @@ void pintaI(Mat &m, std::string wn);
  */
 void pintaMI(const std::vector<Mat> &m);
 
+/**
+ * Edit the pixel's values indicated by the Points
+ * 
+ * @param m Matrix to edit
+ * @param p Points in the matrix to edit
+ */
+void modifyPoints(Mat &m);
+
+/**
+ * Get a vector with Points generated randomly
+ * 
+ * @param m Image to get the pixel from
+ * @return vector<Point>
+ */
+std::vector<Point> randomPixels(const Mat &m);
 #endif	/* UTILS_H */
 

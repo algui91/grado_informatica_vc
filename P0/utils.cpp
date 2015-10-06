@@ -44,6 +44,38 @@ void pintaMI(const std::vector<Mat> &m) {
             item.copyTo(roi);
             x += item.cols;
         }
+        modifyPoints(result);
         pintaI(result, "Ventana");
+    }
+}
+
+std::vector<Point> randomPixels(const Mat &m) {
+
+    std::vector<Point> pixels;
+    if (!m.empty()) {
+        srand(time(NULL));
+
+        for (int i = 0; i < 2048; i++) {
+            int x = rand() % m.cols;
+            int y = rand() % m.rows;
+
+            Point pixel(x, y);
+
+            pixels.push_back(pixel);
+        }
+    }
+    return pixels;
+}
+
+void modifyPoints(Mat &m) {
+    if (!m.empty()) {
+
+        std::vector<Point> pixels = randomPixels(m);
+
+        for (std::vector<Point>::const_iterator it = pixels.begin(); it != pixels.end(); ++it) {
+            Point pixel = (*it);
+
+            m.at<Vec3b>(pixel) = Vec3b(0, 255, 0); // BGR
+        }
     }
 }
