@@ -295,11 +295,49 @@ No es posible pintarlas si no son del mismo tipo, ya que la estructura interna d
 	    }
 \end{cppcode}
 
-
-
 \section{Ejercicio 4}
 
 \miit{Escribir una función que modifique el valor en una imagen de una
 lista de coordenadas de píxeles.}\\
+
+\begin{cppcode}
+	/**
+	* Edit the pixel's values indicated by the Points
+	*
+	* @param m Matrix to edit
+	*/
+	void modifyPoints(Mat &m) {
+	    if (!m.empty()) {
+	        std::vector<Point> pixels = randomPixels(m);
+	        for (std::vector<Point>::const_iterator it = pixels.begin(); it != pixels.end(); ++it) {
+	            Point pixel = (*it);
+	            // Change the value of the pixel, it is store as BGR instead of RGB
+	            m.at<Vec3b>(pixel) = Vec3b(0, 255, 0); // BGR
+	        }
+	    }
+	}
+	/**
+	* Get a vector with Points generated randomly
+	*
+	* @param m Image to get the pixel from
+	* @return vector<Point>
+	*/
+	std::vector<Point> randomPixels(const Mat &m) {
+	    std::vector<Point> pixels;
+	    if (!m.empty()) {
+	        srand(time(NULL));
+	        // Randomly generate the points to modify
+	        for (int i = 0; i < 2048; i++) {
+	            int x = rand() % m.cols;
+	            int y = rand() % m.rows;
+	            Point pixel(x, y);
+	            pixels.push_back(pixel);
+	        }
+	    }
+	    return pixels;
+	}
+\end{cppcode}
+
+Para realizar este ejercicio, se generan los \cppinline/Point/ a modificar aleatoriamente, en concreto 2048. Tras esto, se itera sobre ellos, se accede en la imagen a dichos puntos y se modifica, modificandolos a verdes. \cppinline/Vec3b/ está en la forma BGR.
 
 \end{document}

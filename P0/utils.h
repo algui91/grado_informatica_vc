@@ -42,7 +42,6 @@ void pintaMI(const std::vector<Mat> &m);
  * Edit the pixel's values indicated by the Points
  * 
  * @param m Matrix to edit
- * @param p Points in the matrix to edit
  */
 void modifyPoints(Mat &m);
 

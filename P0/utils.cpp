@@ -54,7 +54,8 @@ std::vector<Point> randomPixels(const Mat &m) {
     std::vector<Point> pixels;
     if (!m.empty()) {
         srand(time(NULL));
-
+        
+        // Randomly generate the points to modify
         for (int i = 0; i < 2048; i++) {
             int x = rand() % m.cols;
             int y = rand() % m.rows;
@@ -74,7 +75,7 @@ void modifyPoints(Mat &m) {
 
         for (std::vector<Point>::const_iterator it = pixels.begin(); it != pixels.end(); ++it) {
             Point pixel = (*it);
-
+            // Change the value of the pixel, it is store as BGR instead of RGB
             m.at<Vec3b>(pixel) = Vec3b(0, 255, 0); // BGR
         }
     }
