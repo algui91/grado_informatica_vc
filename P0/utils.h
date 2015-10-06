@@ -23,6 +23,13 @@ using namespace cv;
  */
 Mat leerImagen(std::string name, int flag);
 
+/**
+ * Shows an image in the screen
+ * 
+ * @param m Image to show
+ * @param wn Name of the window
+ */
+void pintaI(Mat& m, std::string wn);
 
 #endif	/* UTILS_H */
 

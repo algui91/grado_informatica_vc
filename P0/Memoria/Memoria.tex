@@ -204,9 +204,43 @@ La función es \cppinline/cvtColor/. Digamos que es una función auxiliar de cre
 \miit{Escribir una función que lea una imagen en niveles de gris o en
 color ( im=leeimagen(filename, flagColor))}\\
 
+\begin{cppcode}
+/**
+ * Reads an image in GrayScale or color
+ *
+ * @param name name Name of the image to read
+ * @param flag If set to 0, reads the image in color, otherwise in grayscale, default 0.
+ * @return A @ref cv::Mat matrix representing the image
+ */
+Mat leerImagen(std::string name, int flag) {
+   return imread(name, flag ? IMREAD_GRAYSCALE : IMREAD_COLOR);
+}
+
+Mat a = leerImagen("lena.jpg", 0);
+\end{cppcode}
+
 \section{Ejercicio 2}
 
 \miit{Escribir una función que visualice una imagen (pintaI(im))}\\
+
+\begin{cppcode}
+/**
+* Shows an image in the screen
+*
+* @param m Image to show
+* @param wn Name of the window
+*/
+void pintaI(Mat &m, std::string windowName){
+    if (!m.empty()){
+        namedWindow(windowName, WINDOW_AUTOSIZE);
+        imshow(windowName, m);
+        waitKey(0);
+        destroyWindow(windowName);
+    }
+}
+
+pintaI(a, "MiVentana");
+\end{cppcode}
 
 \section{Ejercicio 3}
 
