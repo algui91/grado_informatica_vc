@@ -107,6 +107,7 @@
 		fontsize=\scriptsize,
 		tabsize=2,
 		fontfamily=DejaVuSansMono-TLF,
+		breaklines,
 }
 
 \newmintedfile[myCpp]{cpp}{
@@ -252,6 +253,48 @@ El propósito de \cppinline/pintaI/ es encapsular el proceso de mostrar una imag
 pintaMI(vim). (vim será una secuencia de imágenes) ¿Qué pasa
 si las imágenes no son todas del mismo tipo: (nivel de gris, color,
 blanco-negro)?}\\
+
+No es posible pintarlas si no son del mismo tipo, ya que la estructura interna de la imagen es distinta. Para conseguir mostrarlas, hay que convertirlas al mismo tipo de estructura. En este caso, se ha tomado la decisión de representar la matriz como un \cppinline/CV_8UC3/, de modo que las imágenes a color puedan mostrarse con color. Cualquier imagen distinta a este tipo, será convertida para poder mostrarla por pantalla.
+
+\begin{cppcode}
+	/**
+	* Shows a list of images
+	* @param m list of images to show. If they are of different types, all are
+	* converted to color (CV_8UC3)
+	*/
+	void pintaMI(const std::vector<Mat> &m) {
+	    if (!m.empty()) {
+	        int height = 0;
+	        int width = 0;
+
+	        // Get the size of the resulting window in which to draw the images
+	        // The window will be the sum of all width and the height of the greatest image
+	        for (std::vector<Mat>::const_iterator it = m.begin(); it != m.end(); ++it) {
+	            Mat item = (*it);
+	            width += item.cols;
+	            if (item.rows > height) {
+									// fdsjfksdjf ksladfjdklfjsdklfjdsaklf jsdalkf jsdklfjsdaklfjsdkaljfsdklajfsdklaj fsadkljfklsad fjlskad jflsdkafkls flsaflksfjkls
+	                height = item.rows;
+	            }
+	        }
+
+	        // Create a Mat to store all the images
+	        Mat result(height, width, CV_8UC3);
+
+	        int x = 0;
+	        for (std::vector<Mat>::const_iterator it = m.begin(); it != m.end(); ++it) {
+	            Mat item = (*it);
+	            // If a image is in grayscale or black and white, convert it to 3 channels 8 bit depth
+	            if (item.type() != CV_8UC3) {
+	                cvtColor(item, item, CV_GRAY2RGB);
+	            }
+	            Mat roi(result, Rect(x, 0, item.cols, item.rows));
+	            item.copyTo(roi);
+	            x += item.cols;
+	        }
+	        pintaI(result, "Ventana");
+	    }
+\end{cppcode}
 
 
 
