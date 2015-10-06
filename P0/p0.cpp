@@ -17,8 +17,19 @@ using namespace cv;
 
 int main(int argc, char* argv[]) {
 
-    Mat a = leerImagen("lena.jpg", 1);
-    pintaI(a, "MiVentana");
-
+//    Mat a = leerImagen("lena.jpg", 1);
+//    pintaI(a, "MiVentana");
+    
+    Mat lena = imread("ball.png", IMREAD_UNCHANGED);
+    Mat ball = imread("lena.jpg", IMREAD_UNCHANGED);
+    Mat lena2 = imread("lena.jpg", IMREAD_UNCHANGED);
+    
+    vector<Mat> vec;
+    vec.push_back(ball);
+    vec.push_back(lena);
+    vec.push_back(lena2);
+    
+    pintaMI(vec);
+    
     return 0;
 }

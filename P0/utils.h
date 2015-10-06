@@ -29,7 +29,13 @@ Mat leerImagen(std::string name, int flag);
  * @param m Image to show
  * @param wn Name of the window
  */
-void pintaI(Mat& m, std::string wn);
+void pintaI(Mat &m, std::string wn);
+
+/**
+ * Shows a list of images
+ * @param m list of images to show
+ */
+void pintaMI(const std::vector<Mat> &m);
 
 #endif	/* UTILS_H */
 

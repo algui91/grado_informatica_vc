@@ -219,6 +219,8 @@ Mat leerImagen(std::string name, int flag) {
 Mat a = leerImagen("lena.jpg", 0);
 \end{cppcode}
 
+Esta función simplemente es un \textit{wrapper} de \cppinline{imread}, que leerá la imagen en escala de grises o color, segun el \textit{flag} pasado como parámetro.
+
 \section{Ejercicio 2}
 
 \miit{Escribir una función que visualice una imagen (pintaI(im))}\\
@@ -242,12 +244,16 @@ void pintaI(Mat &m, std::string windowName){
 pintaI(a, "MiVentana");
 \end{cppcode}
 
+El propósito de \cppinline/pintaI/ es encapsular el proceso de mostrar una imagen por pantalla. Se asigna un nombre a la ventana, se crea y se muestra. Se espera a que el usuario pulse una tecla y se destruye.
+
 \section{Ejercicio 3}
 
 \miit{Escribir una función que visualice varias imágenes a la vez:
 pintaMI(vim). (vim será una secuencia de imágenes) ¿Qué pasa
 si las imágenes no son todas del mismo tipo: (nivel de gris, color,
 blanco-negro)?}\\
+
+
 
 \section{Ejercicio 4}
 
