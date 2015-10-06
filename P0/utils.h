@@ -33,7 +33,8 @@ void pintaI(Mat &m, std::string wn);
 
 /**
  * Shows a list of images
- * @param m list of images to show
+ * @param m list of images to show. If they are of different types, all are 
+ * converted to color (CV_8UC3)
  */
 void pintaMI(const std::vector<Mat> &m);
 

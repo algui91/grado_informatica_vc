@@ -20,27 +20,30 @@ void pintaMI(const std::vector<Mat> &m) {
         int height = 0;
         int width = 0;
 
-
+        // Get the size of the resulting window in which to draw the images
+        // The window will be the sum of all width and the height of the greatest image
         for (std::vector<Mat>::const_iterator it = m.begin(); it != m.end(); ++it) {
-            width += (*it).cols;
-            if ((*it).rows > height) {
-                height = (*it).rows;
+            Mat item = (*it);
+            width += item.cols;
+            if (item.rows > height) {
+                height = item.rows;
             }
         }
-        // Create a Mat the size of all the images
+
+        // Create a Mat to store all the images
         Mat result(height, width, CV_8UC3);
 
         int x = 0;
         for (std::vector<Mat>::const_iterator it = m.begin(); it != m.end(); ++it) {
             Mat item = (*it);
-            if (item.type() == CV_8UC1 || item.type() == CV_16SC1 || item.type() == CV_32SC1) {
+            // If a image is in grayscale or black and white, convert it to 3 channels 8 bit depth
+            if (item.type() != CV_8UC3) {
                 cvtColor(item, item, CV_GRAY2RGB);
             }
             Mat roi(result, Rect(x, 0, item.cols, item.rows));
             item.copyTo(roi);
             x += item.cols;
         }
-
         pintaI(result, "Ventana");
     }
 }
