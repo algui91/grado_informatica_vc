@@ -17,7 +17,8 @@ using namespace cv;
 
 int main(int argc, char* argv[]) {
 
-    leerImagen("hola", 0);
+    Mat a = leerImagen("lena.jpg", 0);
+    
 
     return 0;
 }

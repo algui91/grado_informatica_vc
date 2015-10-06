@@ -18,7 +18,7 @@ using namespace cv;
  * Reads an image in GrayScale or color
  * 
  * @param name name Name of the image to read
- * @param flag If set to 0, reads the image in grayscale, if set to 1 in color
+ * @param flag If set to 0, reads the image in color, otherwise in grayscale, default 0.
  * @return A @ref cv::Mat matrix representing the image
  */
 Mat leerImagen(std::string name, int flag);
