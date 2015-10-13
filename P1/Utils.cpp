@@ -16,11 +16,19 @@ Mat myGetGaussianKernel1D(double sigma) {
     // Kernel size
     int ksize = 2 * sigma + 1;
 
-    Mat kernel(ksize, 1, CV_64F);
+    Mat kernel(1, ksize, CV_64F);
 
     // Compute the mask with the given sigma
-    for (int i = -sigma; i <= sigma; i++)
-        kernel.at<double>(i, 0) = (double) exp(-.5 * ((i * i) / sigma * sigma));
-
+    double sum = 0;
+    for (int i = -sigma; i <= sigma; i++) {
+        // i+sigma to start at index 0
+        int index = i + sigma;
+        kernel.at<double>(index) = (double) exp(-.5 * ((i * i) / sigma * sigma));
+        sum += kernel.at<double>(index);
+    }
+    
+    // Normalize the kernel to sum 1, it is a smooth kernel
+    kernel = kernel * (1/sum);
+    
     return kernel;
 }
