@@ -17,7 +17,7 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-    
+    // Exercise one
     myGetGaussianKernel1D(3);
     return 0;
 }
