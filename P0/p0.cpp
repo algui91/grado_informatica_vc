@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     vec.push_back(ball2);
     vec.push_back(lena);
     vec.push_back(lena2);
-
+    
     modifyPoints(lena);
 //    modifyPoints(ball);
             
