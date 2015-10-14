@@ -31,5 +31,23 @@ void gaussConvolution(Mat &im, Mat &mask, Mat &out);
  */
 Mat myGetGaussianKernel1D(double sigma);
 
+/**
+ * Computes the 1D convolution for the given signal vector, using the kernel
+ * 
+ * @param signalVector Vector in which apply the convolution.
+ * @param kernel The mask to use
+ * @param border Only allows BORDER_CONSTANT|BORDER_REFLECT
+ * @return 
+ */
+Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border);
+
+/**
+ * Shows an image in the screen
+ * 
+ * @param m Image to show
+ * @param wn Name of the window
+ */
+void drawImage(Mat &m, string wn);
+
 #endif	/* UTILS_H */
 

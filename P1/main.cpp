@@ -17,7 +17,21 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-    // Exercise one
-    myGetGaussianKernel1D(3);
+    // Exercise one, compute Gaussian kernel
+    Mat kernel = myGetGaussianKernel1D(3);
+    // Exercise two, compute convolution of a 1D signal vector and a kernel
+//    Mat image = imread("./images/dog.bmp",IMREAD_GRAYSCALE);
+//    drawImage(image, "antes");
+    Mat vector(1,7, CV_64F);
+    vector = vector.ones(1, 7, CV_64F);
+//    vector.at<double>(0) = 10;
+//    vector.at<double>(1) = 50;
+//    vector.at<double>(2) = 60;
+//    vector.at<double>(3) = 10;
+//    vector.at<double>(4) = 20;
+//    vector.at<double>(5) = 40;
+//    vector.at<double>(6) = 30;
+    Mat result = convolutionOperator1D(vector, kernel, BORDER_CONSTANT);
+    cout << result << endl;
     return 0;
 }
