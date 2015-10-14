@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 //    vector.at<double>(4) = 20;
 //    vector.at<double>(5) = 40;
 //    vector.at<double>(6) = 30;
-    Mat result = convolutionOperator1D(vector, kernel, BORDER_CONSTANT);
+    Mat result = convolutionOperator1D(vector, kernel, BORDER_REFLECT);
     cout << result << endl;
     return 0;
 }

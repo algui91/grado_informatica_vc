@@ -44,7 +44,7 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
     Mat signalWithBorder(1, signalVector.cols + kernel.cols / 2, signalVector.type());
     // Add extra borders to the vector to solve boundary issue
     //TODO: parametric border type
-    copyMakeBorder(signalVector, signalWithBorder, 0, 0, extraBorder, extraBorder, BORDER_CONSTANT, Scalar(0));
+    copyMakeBorder(signalVector, signalWithBorder, 0, 0, extraBorder, extraBorder, border, Scalar(0));
     // Vector to store the convolution result
     Mat filtered = signalVector.clone();
     // If the # channels is > 1, we need to split the vector into its channels
@@ -59,6 +59,7 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
             // Move the Roi one position to the right
             roi = roi.adjustROI(0, 0, -1, 1);
         }
+        cout << signalWithBorder << endl;
     } else {
         //        Mat channels[signalVector.channels()];
         //        split(signalVector, channels);
