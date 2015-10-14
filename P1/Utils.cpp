@@ -40,27 +40,21 @@ Mat myGetGaussianKernel1D(double sigma) {
 Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
 
     int extraBorder = kernel.cols / 2;
-
+    
     Mat signalWithBorder(1, signalVector.cols + kernel.cols / 2, signalVector.type());
     // Add extra borders to the vector to solve boundary issue
-    //TODO: parametrice border type
+    //TODO: parametric border type
     copyMakeBorder(signalVector, signalWithBorder, 0, 0, extraBorder, extraBorder, BORDER_CONSTANT, Scalar(0));
-    // Vector to store the convolution operation
-    Mat filtered = signalWithBorder.clone();
-//    kernel.at<double>(0) = (double) 1 / 3;
-//    kernel.at<double>(1) = (double) 1 / 3;
-//    kernel.at<double>(2) = (double) 1 / 3;
+    // Vector to store the convolution result
+    Mat filtered = signalVector.clone();
     // If the # channels is > 1, we need to split the vector into its channels
     if (signalVector.channels() == 1) {
         // Create a ROI to pass along the vector and compute convolution with the kernel
         Mat roi(signalWithBorder, Rect(0, 0, kernel.cols, 1));
-        for (int i = extraBorder; i < signalWithBorder.cols - extraBorder; i++) {
+        for (int i = 0; i < signalVector.cols; i++) {
             Mat r = roi.mul(kernel);
             cout << roi << endl;
-            cout << r << endl;
-            cout << *(sum(r).val) << endl;
             filtered.at<double>(i) = (double) *(sum(r).val);
-            cout << filtered << endl;
             roi = roi.adjustROI(0, 0, -1, 1);
         }
     } else {
