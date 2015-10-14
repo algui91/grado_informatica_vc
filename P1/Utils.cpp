@@ -52,9 +52,11 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
         // Create a ROI to pass along the vector and compute convolution with the kernel
         Mat roi(signalWithBorder, Rect(0, 0, kernel.cols, 1));
         for (int i = 0; i < signalVector.cols; i++) {
+            // Multiply the focused section by the kernel
             Mat r = roi.mul(kernel);
-            cout << roi << endl;
+            // Sum the result of the above operation to the pixel at i
             filtered.at<double>(i) = (double) *(sum(r).val);
+            // Move the Roi one position to the right
             roi = roi.adjustROI(0, 0, -1, 1);
         }
     } else {
