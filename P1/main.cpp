@@ -22,8 +22,9 @@ int main(int argc, char** argv) {
     // Exercise two, compute convolution of a 1D signal vector and a kernel
 //    Mat image = imread("./images/dog.bmp",IMREAD_GRAYSCALE);
 //    drawImage(image, "antes");
-    Mat vector(1,7, CV_64F);
-    vector = vector.ones(1, 7, CV_64F);
+    // create and initialize 3 channel Mat
+    Mat vector(1,7, CV_64FC3, CV_RGB(50, 150, 255));
+//    Mat vector(1,7, CV_64F);
 //    vector.at<double>(0) = 10;
 //    vector.at<double>(1) = 50;
 //    vector.at<double>(2) = 60;
@@ -32,6 +33,5 @@ int main(int argc, char** argv) {
 //    vector.at<double>(5) = 40;
 //    vector.at<double>(6) = 30;
     Mat result = convolutionOperator1D(vector, kernel, BORDER_REFLECT);
-    cout << result << endl;
     return 0;
 }

@@ -40,18 +40,23 @@ Mat myGetGaussianKernel1D(double sigma) {
 Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
 
     int extraBorder = kernel.cols / 2;
-    
-    Mat signalWithBorder(1, signalVector.cols + kernel.cols / 2, signalVector.type());
-    // Add extra borders to the vector to solve boundary issue
-    //TODO: parametric border type
-    copyMakeBorder(signalVector, signalWithBorder, 0, 0, extraBorder, extraBorder, border, Scalar(0));
-    // Vector to store the convolution result
-    Mat filtered = signalVector.clone();
-    // If the # channels is > 1, we need to split the vector into its channels
-    if (signalVector.channels() == 1) {
+
+    vector<Mat> signalVectorByChannels(signalVector.channels());
+    split(signalVector, signalVectorByChannels);
+
+    Mat filtered;
+
+    for (vector<Mat>::const_iterator it = signalVectorByChannels.begin(); it != signalVectorByChannels.end(); ++it) {
+        Mat m = *(it);
+        // Create a new Mat with the extra borders needed
+        Mat signalWithBorder(1, m.cols + kernel.cols / 2, m.type());
+        // Add extra borders to the vector to solve boundary issue
+        copyMakeBorder(m, signalWithBorder, 0, 0, extraBorder, extraBorder, border, Scalar(0));
+        // Vector to store the convolution result
+        filtered = m.clone();
         // Create a ROI to pass along the vector and compute convolution with the kernel
         Mat roi(signalWithBorder, Rect(0, 0, kernel.cols, 1));
-        for (int i = 0; i < signalVector.cols; i++) {
+        for (int i = 0; i < m.cols; i++) {
             // Multiply the focused section by the kernel
             Mat r = roi.mul(kernel);
             // Sum the result of the above operation to the pixel at i
@@ -59,14 +64,10 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
             // Move the Roi one position to the right
             roi = roi.adjustROI(0, 0, -1, 1);
         }
-        cout << signalWithBorder << endl;
-    } else {
-        //        Mat channels[signalVector.channels()];
-        //        split(signalVector, channels);
-        //        for (int i = 0; i < signalVector.channels(); i++) {
-        //            channels = channels
-        //        }
+        filtered.copyTo(m);
     }
+    // Merge the vectors into a multichannel Mat
+    merge(signalVectorByChannels, filtered);
 
     return filtered;
 }
