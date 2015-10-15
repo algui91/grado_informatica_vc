@@ -21,15 +21,16 @@ Mat myGetGaussianKernel1D(double sigma) {
     Mat kernel(1, ksize, CV_64F);
 
     // Compute the mask with the given sigma
-    double sum = 0;
+    double ssum = 0;
     for (int i = -sigma; i <= sigma; i++) {
         // i+sigma to start at index 0
         int index = i + sigma;
         kernel.at<double>(index) = (double) exp(-.5 * ((i * i) / (sigma * sigma)));
-        sum += kernel.at<double>(index);
+        ssum += kernel.at<double>(index);
     }
+
     // Normalize the kernel to sum 1, it is a smooth kernel
-    kernel = kernel * (1 / sum);
+    kernel = kernel * (1 / ssum);
 
     return kernel;
 }
@@ -74,18 +75,26 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
 
 Mat computeConvolution(Mat &m, double sigma) {
 
-//    Mat copy = m.clone();
-//    int type = copy.channels() == 1 ? CV_64F : CV_64FC3;
-//    copy.convertTo(copy, type);
-//    Mat kernel = myGetGaussianKernel1D(sigma);
-//    // This kernel is separable, apply convolution for rows and columns
-//    for (int i = 0; i < 20; i++) {
-//        result = copy.row(i);
-//        copy.row(j).copyTo(A.row(i));
-////        result = convolutionOperator1D(result, kernel, BORDER_CONSTANT);
-//    }
-//    result.convertTo(result, m.type());
-//    return result;
+    Mat result = m.clone();
+    // Store type to restore it when the convolution is computed
+    int type = result.channels() == 1 ? CV_64F : CV_64FC3;
+    // Convert the image to a 64F type, (one or three channels)
+    result.convertTo(result, type);
+    Mat kernel = myGetGaussianKernel1D(sigma);
+    // This kernel is separable, apply convolution for rows and columns separately
+    for (int i = 0; i < result.rows; i++) {
+        Mat row = result.row(i);
+        row = convolutionOperator1D(row, kernel, BORDER_CONSTANT);
+        row.copyTo(result.row(i));
+    }
+    for (int i = 0; i < result.cols; i++) {
+        Mat col = result.col(i);
+        col = convolutionOperator1D(col, kernel, BORDER_CONSTANT);
+        col.copyTo(result.col(i));
+    }
+    result.convertTo(result, m.type());
+    
+    return result;
 }
 
 //////////////////////////////////////////////////////
