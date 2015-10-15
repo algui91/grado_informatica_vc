@@ -15,15 +15,6 @@ using namespace std;
 using namespace cv;
 
 /**
- * Computes the two-dimensional convolution of an image with a mask
- * 
- * @param im Input image
- * @param mask Mask to use
- * @param out Output image with the mask applied
- */
-void gaussConvolution(Mat &im, Mat &mask, Mat &out);
-
-/**
  * Get a 1D Gaussian kernel for the given parameters
  * 
  * @param sigma 

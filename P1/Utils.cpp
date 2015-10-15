@@ -7,10 +7,6 @@
 
 #include "Utils.h"
 
-void gaussConvolution(Mat &im, Mat &mask, Mat &out) {
-
-}
-
 //////////////////////////////////////////////////////
 
 Mat myGetGaussianKernel1D(double sigma) {
