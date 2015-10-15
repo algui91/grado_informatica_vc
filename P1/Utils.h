@@ -27,6 +27,7 @@ void gaussConvolution(Mat &im, Mat &mask, Mat &out);
  * Get a 1D Gaussian kernel for the given parameters
  * 
  * @param sigma 
+ * @param type Type of Mat
  * @return The kernel
  */
 Mat myGetGaussianKernel1D(double sigma);
@@ -40,6 +41,15 @@ Mat myGetGaussianKernel1D(double sigma);
  * @return 
  */
 Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border);
+
+/**
+ * Compute the convolution of an image using the given sigma
+ * 
+ * @param m The image to which apply convolution
+ * @param sigma Sigma to compute the Gaussian kernel
+ * @return An image with the filter applied
+ */
+Mat computeConvolution(Mat &m, double sigma);
 
 /**
  * Shows an image in the screen

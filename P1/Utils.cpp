@@ -25,10 +25,9 @@ Mat myGetGaussianKernel1D(double sigma) {
     for (int i = -sigma; i <= sigma; i++) {
         // i+sigma to start at index 0
         int index = i + sigma;
-        kernel.at<double>(index) = (double) exp(-.5 * ((i * i) / sigma * sigma));
+        kernel.at<double>(index) = (double) exp(-.5 * ((i * i) / (sigma * sigma)));
         sum += kernel.at<double>(index);
     }
-
     // Normalize the kernel to sum 1, it is a smooth kernel
     kernel = kernel * (1 / sum);
 
@@ -68,8 +67,25 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
     }
     // Merge the vectors into a multichannel Mat
     merge(signalVectorByChannels, filtered);
-
     return filtered;
+}
+
+//////////////////////////////////////////////////////
+
+Mat computeConvolution(Mat &m, double sigma) {
+
+//    Mat copy = m.clone();
+//    int type = copy.channels() == 1 ? CV_64F : CV_64FC3;
+//    copy.convertTo(copy, type);
+//    Mat kernel = myGetGaussianKernel1D(sigma);
+//    // This kernel is separable, apply convolution for rows and columns
+//    for (int i = 0; i < 20; i++) {
+//        result = copy.row(i);
+//        copy.row(j).copyTo(A.row(i));
+////        result = convolutionOperator1D(result, kernel, BORDER_CONSTANT);
+//    }
+//    result.convertTo(result, m.type());
+//    return result;
 }
 
 //////////////////////////////////////////////////////
