@@ -18,13 +18,13 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-    bool debug = true;
+    bool debug = false;
 
     // Exercise one, compute Gaussian kernel
     double sigma = 3;
     Mat kernel = myGetGaussianKernel1D(sigma);
     if (!debug) {
-        cout << "Exercise one result: (with sigma=" << sigma << ")" << endl;
+        cout << "EXCERSICE ONE RESULT: (with sigma=" << sigma << ")" << endl;
         cout << setw(15) << "Kernel: " << kernel << endl;
         cout << "Press enter to show next exercise result" << endl;
         cin.get();
@@ -35,10 +35,10 @@ int main(int argc, char** argv) {
     Mat vector(1, 7, CV_64FC3, CV_RGB(50, 150, 255));
     Mat result = convolutionOperator1D(vector, kernel, BORDER_CONSTANT);
     if (!debug) {
-        cout << "Exercise two result: (with BORDER_CONSTANT)" << endl;
+        cout << "EXCERSICE TWO RESULT: (with BORDER_CONSTANT)" << endl;
         cout << setw(15) << "Convol1D: " << result << endl;
         cout << "Press enter to show next example" << endl;
-        cout << "Exercise two result: (with BORDER_REFLECT)" << endl;
+        cout << "EXCERSICE TWO RESULT: (with BORDER_REFLECT)" << endl;
         result = convolutionOperator1D(vector, kernel, BORDER_REFLECT);
         cout << setw(15) << "Convol1D: " << result << endl;
         cout << "Press enter to show next exercise result" << endl;
@@ -46,17 +46,19 @@ int main(int argc, char** argv) {
     }
 
     // Exercise three
-    Mat colorImage = imread("./images/dog.bmp", IMREAD_UNCHANGED);
-    Mat grayImage = imread("./images/dog.bmp", IMREAD_GRAYSCALE);
-    
-    drawImage(colorImage, "Before|ColorImage");
-    drawImage(grayImage, "Before|GrayImage");
-    
-    colorImage = computeConvolution(colorImage, sigma);
-    grayImage = computeConvolution(grayImage, sigma);
-    
-    drawImage(colorImage, "After|ColorImage");
-    drawImage(grayImage, "After|GrayImage");
+    if (!debug) {
+        cout << "EXCERSICE THREE RESULT:" << endl;
+        Mat colorImage = imread("./images/dog.bmp", IMREAD_UNCHANGED);
+        Mat grayImage = imread("./images/dog.bmp", IMREAD_GRAYSCALE);
 
+        drawImage(colorImage, "Before Convolution | ColorImage");
+        drawImage(grayImage, "Before Convolution | GrayImage");
+
+        colorImage = computeConvolution(colorImage, sigma);
+        grayImage = computeConvolution(grayImage, sigma);
+
+        drawImage(colorImage, "After Convolution | ColorImage");
+        drawImage(grayImage, "After Convolution | GrayImage");
+    }
     return 0;
 }

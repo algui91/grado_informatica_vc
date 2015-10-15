@@ -75,6 +75,8 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
 
 Mat computeConvolution(Mat &m, double sigma) {
 
+    // TODO only allow C1 or C3  CV_Assert(src.channels() == 3);
+    
     Mat result = m.clone();
     // Store type to restore it when the convolution is computed
     int type = result.channels() == 1 ? CV_64F : CV_64FC3;
