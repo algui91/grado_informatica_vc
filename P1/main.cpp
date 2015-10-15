@@ -46,10 +46,17 @@ int main(int argc, char** argv) {
     }
 
     // Exercise three
-    Mat image = imread("./images/dog.bmp", IMREAD_GRAYSCALE);
-    drawImage(image, "Before");
-    image = computeConvolution(image, sigma);
-    drawImage(image, "After");
+    Mat colorImage = imread("./images/dog.bmp", IMREAD_UNCHANGED);
+    Mat grayImage = imread("./images/dog.bmp", IMREAD_GRAYSCALE);
+    
+    drawImage(colorImage, "Before|ColorImage");
+    drawImage(grayImage, "Before|GrayImage");
+    
+    colorImage = computeConvolution(colorImage, sigma);
+    grayImage = computeConvolution(grayImage, sigma);
+    
+    drawImage(colorImage, "After|ColorImage");
+    drawImage(grayImage, "After|GrayImage");
 
     return 0;
 }
