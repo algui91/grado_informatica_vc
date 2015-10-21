@@ -91,6 +91,7 @@ Mat computeConvolution(Mat &m, double sigma) {
             row = convolutionOperator1D(row, kernel, BORDER_CONSTANT);
             row.copyTo(result.row(i));
         }
+        // TODO, this does not work
         for (int i = 0; i < result.cols; i++) {
             Mat col = result.col(i);
             col = convolutionOperator1D(col, kernel, BORDER_CONSTANT);
@@ -107,7 +108,7 @@ void drawImage(Mat &m, string windowName) {
     if (!m.empty()) {
         namedWindow(windowName, WINDOW_AUTOSIZE);
         imshow(windowName, m);
-        waitKey(0);
-        destroyWindow(windowName);
+//        waitKey(0);
+//        destroyWindow(windowName);
     }
 }

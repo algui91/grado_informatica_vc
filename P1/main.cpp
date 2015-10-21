@@ -18,10 +18,10 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-    bool debug = false;
+    bool debug = true;
 
     // Exercise one, compute Gaussian kernel
-    double sigma = 3;
+    double sigma = 50;
     Mat kernel = myGetGaussianKernel1D(sigma);
     if (!debug) {
         cout << "EXCERSICE ONE RESULT: (with sigma=" << sigma << ")" << endl;
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
     }
 
     // Exercise three
-    if (!debug) {
+    if (debug) {
         cout << "EXCERSICE THREE RESULT:" << endl;
         Mat colorImage = imread("./images/dog.bmp", IMREAD_UNCHANGED);
         Mat grayImage = imread("./images/dog.bmp", IMREAD_GRAYSCALE);
@@ -59,6 +59,9 @@ int main(int argc, char** argv) {
 
         drawImage(colorImage, "After Convolution | ColorImage");
         drawImage(grayImage, "After Convolution | GrayImage");
+        
+        waitKey(0);
+//        destroyWindow(windowName);
     }
     return 0;
 }
