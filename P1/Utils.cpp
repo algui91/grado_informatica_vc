@@ -36,8 +36,14 @@ Mat myGetGaussianKernel1D(double sigma) {
 Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
 
     Mat filtered;
+    bool was1col = false;
 
     if (!signalVector.empty() || !kernel.empty()) {
+        // If we receive a signalvector with one column, transpose it
+        if (signalVector.cols == 1) {
+            signalVector = signalVector.t();
+            was1col =  true;
+        }
         int extraBorder = kernel.cols / 2;
 
         vector<Mat> signalVectorByChannels(signalVector.channels());
@@ -68,6 +74,8 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
         merge(signalVectorByChannels, filtered);
     }
 
+    filtered = was1col ? filtered.t() : filtered;
+    
     return filtered;
 }
 
@@ -91,7 +99,6 @@ Mat computeConvolution(Mat &m, double sigma) {
             row = convolutionOperator1D(row, kernel, BORDER_CONSTANT);
             row.copyTo(result.row(i));
         }
-        // TODO, this does not work
         for (int i = 0; i < result.cols; i++) {
             Mat col = result.col(i);
             col = convolutionOperator1D(col, kernel, BORDER_CONSTANT);
@@ -108,7 +115,7 @@ void drawImage(Mat &m, string windowName) {
     if (!m.empty()) {
         namedWindow(windowName, WINDOW_AUTOSIZE);
         imshow(windowName, m);
-//        waitKey(0);
-//        destroyWindow(windowName);
+        waitKey(0);
+        destroyWindow(windowName);
     }
 }

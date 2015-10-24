@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     bool debug = true;
 
     // Exercise one, compute Gaussian kernel
-    double sigma = 50;
+    double sigma = 3;
     Mat kernel = myGetGaussianKernel1D(sigma);
     if (!debug) {
         cout << "EXCERSICE ONE RESULT: (with sigma=" << sigma << ")" << endl;
@@ -59,9 +59,7 @@ int main(int argc, char** argv) {
 
         drawImage(colorImage, "After Convolution | ColorImage");
         drawImage(grayImage, "After Convolution | GrayImage");
-        
-        waitKey(0);
-//        destroyWindow(windowName);
     }
+    
     return 0;
 }
