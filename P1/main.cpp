@@ -18,7 +18,7 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-    bool debug = true;
+    bool debug = false;
 
     // Exercise one, compute Gaussian kernel
     double sigma = 3;
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
     }
 
     // Exercise three
-    if (debug) {
+    if (!debug) {
         cout << "EXCERSICE THREE RESULT:" << endl;
         Mat colorImage = imread("./images/dog.bmp", IMREAD_UNCHANGED);
         Mat grayImage = imread("./images/dog.bmp", IMREAD_GRAYSCALE);
