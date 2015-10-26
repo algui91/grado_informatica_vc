@@ -18,7 +18,7 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-    bool debug = true;
+    bool debug = false;
 
     // Exercise one, compute Gaussian kernel
     double sigma = 10;
@@ -115,15 +115,13 @@ int main(int argc, char** argv) {
         cout << "Press enter to show the next exercise result" << endl;
         cin.get();
 
-        // Ercercise five
+        // Exercise five
         gaussianPyramid(hybrid.at(0), 7);
         gaussianPyramid(hybrid2.at(0), 7);
         gaussianPyramid(hybrid3.at(0), 7);
         gaussianPyramid(hybrid4.at(0), 7);
         gaussianPyramid(hybrid5.at(0), 7);
     }
-
-
 
     return 0;
 }
