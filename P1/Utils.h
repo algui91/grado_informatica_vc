@@ -32,7 +32,7 @@ Mat myGetGaussianKernel1D(double sigma, bool highpass = false);
  * @param border Only allows BORDER_CONSTANT|BORDER_REFLECT
  * @return 
  */
-Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border);
+Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border = BORDER_CONSTANT);
 
 /**
  * Compute the convolution of an image using the given sigma

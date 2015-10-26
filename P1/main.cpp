@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
     }
 
     // Exercise four
-    if (debug) {
+    if (!debug) {
         cout << "EXCERSICE FOUR RESULT:" << endl;
 
         // low = marylin, high = einstein, 25, 8
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 
         std::vector<Mat> hybrid = hybridImage(high, low, 12, 20);
         drawHybrid(hybrid);
-        
+
         cout << "Press enter to show the next hybrid image" << endl;
 
         low = imread("./images/marilyn.bmp", IMREAD_UNCHANGED);
@@ -122,6 +122,7 @@ int main(int argc, char** argv) {
         gaussianPyramid(hybrid4.at(0), 7);
         gaussianPyramid(hybrid5.at(0), 7);
     }
+
 
 
     return 0;
