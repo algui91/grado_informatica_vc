@@ -9,7 +9,7 @@
 
 //////////////////////////////////////////////////////
 
-Mat myGetGaussianKernel1D(double sigma) {
+Mat myGetGaussianKernel1D(double sigma, bool highpass) {
 
     // Kernel size
     int ksize = 2 * sigma + 1;
@@ -21,7 +21,8 @@ Mat myGetGaussianKernel1D(double sigma) {
     for (int i = -sigma; i <= sigma; i++) {
         // i+sigma to start at index 0
         int index = i + sigma;
-        kernel.at<double>(index) = (double) exp(-.5 * ((i * i) / (sigma * sigma)));
+        double gaussian = (double) exp(-.5 * ((i * i) / (sigma * sigma)));
+        kernel.at<double>(index) = highpass ? 1 - gaussian : gaussian;
         ssum += kernel.at<double>(index);
     }
 
@@ -42,7 +43,7 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
         // If we receive a signalvector with one column, transpose it
         if (signalVector.cols == 1) {
             signalVector = signalVector.t();
-            was1col =  true;
+            was1col = true;
         }
         int extraBorder = kernel.cols / 2;
 
@@ -75,13 +76,13 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
     }
 
     filtered = was1col ? filtered.t() : filtered;
-    
+
     return filtered;
 }
 
 //////////////////////////////////////////////////////
 
-Mat computeConvolution(Mat &m, double sigma) {
+Mat computeConvolution(Mat &m, double sigma, bool highpass) {
 
     // TODO only allow C1 or C3  CV_Assert(src.channels() == 3);
     Mat result;
@@ -92,20 +93,42 @@ Mat computeConvolution(Mat &m, double sigma) {
         int type = result.channels() == 1 ? CV_64F : CV_64FC3;
         // Convert the image to a 64F type, (one or three channels)
         result.convertTo(result, type);
-        Mat kernel = myGetGaussianKernel1D(sigma);
+        Mat kernel = myGetGaussianKernel1D(sigma, highpass);
         // This kernel is separable, apply convolution for rows and columns separately
         for (int i = 0; i < result.rows; i++) {
             Mat row = result.row(i);
-            row = convolutionOperator1D(row, kernel, BORDER_CONSTANT);
+            row = convolutionOperator1D(row, kernel, BORDER_REFLECT);
             row.copyTo(result.row(i));
         }
         for (int i = 0; i < result.cols; i++) {
             Mat col = result.col(i);
-            col = convolutionOperator1D(col, kernel, BORDER_CONSTANT);
+            col = convolutionOperator1D(col, kernel, BORDER_REFLECT);
             col.copyTo(result.col(i));
         }
         result.convertTo(result, m.type());
     }
+    return result;
+}
+
+//////////////////////////////////////////////////////
+
+vector<Mat> hybridImage(Mat &highFreq, Mat &lowFreq, double highSigma, double lowSigma) {
+
+    vector<Mat> result;
+    
+    Mat highBlurred = computeConvolution(highFreq, highSigma, true); // high pass filter
+    Mat lowBlurred = computeConvolution(lowFreq, lowSigma); // low pass filter
+
+    // Get the high frequencies of the image
+    Mat highH = highFreq - highBlurred;
+
+    // Generate the hybrid image
+    Mat H = lowBlurred + highH;
+    
+    result.push_back(H);
+    result.push_back(highH);
+    result.push_back(lowBlurred);
+    
     return result;
 }
 
@@ -117,5 +140,40 @@ void drawImage(Mat &m, string windowName) {
         imshow(windowName, m);
         waitKey(0);
         destroyWindow(windowName);
+    }
+}
+
+//////////////////////////////////////////////////////
+
+void drawHybrid(const std::vector<Mat> &m) {
+    if (!m.empty()) {
+        int height = 0;
+        int width = 0;
+
+        // Get the size of the resulting window in which to draw the images
+        // The window will be the sum of all width and the height of the greatest image
+        for (std::vector<Mat>::const_iterator it = m.begin(); it != m.end(); ++it) {
+            Mat item = (*it);
+            width += item.cols;
+            if (item.rows > height) {
+                height = item.rows;
+            }
+        }
+
+        // Create a Mat to store all the images
+        Mat result(height, width, CV_8UC3);
+
+        int x = 0;
+        for (std::vector<Mat>::const_iterator it = m.begin(); it != m.end(); ++it) {
+            Mat item = (*it);
+            // If a image is in grayscale or black and white, convert it to 3 channels 8 bit depth
+            if (item.type() != CV_8UC3) {
+                cvtColor(item, item, CV_GRAY2RGB);
+            }
+            Mat roi(result, Rect(x, 0, item.cols, item.rows));
+            item.copyTo(roi);
+            x += item.cols;
+        }
+        drawImage(result, "Ventana");
     }
 }

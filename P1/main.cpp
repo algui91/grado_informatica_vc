@@ -18,10 +18,10 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-    bool debug = false;
+    bool debug = true;
 
     // Exercise one, compute Gaussian kernel
-    double sigma = 3;
+    double sigma = 10;
     Mat kernel = myGetGaussianKernel1D(sigma);
     if (!debug) {
         cout << "EXCERSICE ONE RESULT: (with sigma=" << sigma << ")" << endl;
@@ -59,7 +59,61 @@ int main(int argc, char** argv) {
 
         drawImage(colorImage, "After Convolution | ColorImage");
         drawImage(grayImage, "After Convolution | GrayImage");
+
+        cout << "Press enter to show next exercise result" << endl;
+        cin.get();
     }
-    
+
+    // Exercise four
+    if (debug) {
+        cout << "EXCERSICE FOUR RESULT:" << endl;
+
+        // low = marylin, high = einstein, 25, 8
+        // low = dog, high = cat, 20, 12
+        // low = fish, high = submarine, 8, 12
+        // low = motorcycle, high = bicycle, 8, 15
+        // low = bird, high = plane, 6, 15
+
+        Mat low = imread("./images/dog.bmp", IMREAD_UNCHANGED);
+        Mat high = imread("./images/cat.bmp", IMREAD_UNCHANGED);
+
+        std::vector<Mat> hybrid = hybridImage(high, low, 12, 20);
+        drawHybrid(hybrid);
+
+        cout << "Press enter to show the next hybrid image" << endl;
+
+        low = imread("./images/marilyn.bmp", IMREAD_UNCHANGED);
+        high = imread("./images/einstein.bmp", IMREAD_UNCHANGED);
+
+        hybrid = hybridImage(high, low, 25, 8);
+        drawHybrid(hybrid);
+
+        cout << "Press enter to show the next hybrid image" << endl;
+
+        low = imread("./images/fish.bmp", IMREAD_UNCHANGED);
+        high = imread("./images/submarine.bmp", IMREAD_UNCHANGED);
+
+        hybrid = hybridImage(high, low, 12, 8);
+        drawHybrid(hybrid);
+
+        cout << "Press enter to show the next hybrid image" << endl;
+
+        low = imread("./images/motorcycle.bmp", IMREAD_UNCHANGED);
+        high = imread("./images/bicycle.bmp", IMREAD_UNCHANGED);
+
+        hybrid = hybridImage(high, low, 15, 8);
+        drawHybrid(hybrid);
+
+        low = imread("./images/bird.bmp", IMREAD_UNCHANGED);
+        high = imread("./images/plane.bmp", IMREAD_UNCHANGED);
+
+        hybrid = hybridImage(high, low, 15, 6);
+        drawHybrid(hybrid);
+
+        cout << "Press enter to show the next hybrid image" << endl;
+
+        cout << "Press enter to show the next exercise result" << endl;
+        cin.get();
+    }
     return 0;
 }

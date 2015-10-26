@@ -19,9 +19,10 @@ using namespace cv;
  * 
  * @param sigma 
  * @param type Type of Mat
+ * @param highpass True if we want a high pass kernel
  * @return The kernel
  */
-Mat myGetGaussianKernel1D(double sigma);
+Mat myGetGaussianKernel1D(double sigma, bool highpass = false);
 
 /**
  * Computes the 1D convolution for the given signal vector, using the kernel
@@ -38,9 +39,23 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border);
  * 
  * @param m The image to which apply convolution
  * @param sigma Sigma to compute the Gaussian kernel
+ * @param highpass True if we want a high pass kernel
  * @return An image with the filter applied
  */
-Mat computeConvolution(Mat &m, double sigma);
+Mat computeConvolution(Mat &m, double sigma, bool highpass = false);
+
+/**
+ * Computes both high frequency and low frequency with the given sigmas for the
+ * two images passed in
+ * 
+ * @param highFreq The image use as high frequency
+ * @param lowFreq The image use as low frequency
+ * @param highSigma Sigma value for the high frequency
+ * @param lowSigma Sigma value for the low frequency
+ * 
+ * @return A vector with the hybrid image, low and high freq images
+ */
+vector<Mat> hybridImage(Mat &highFreq, Mat &lowFreq, double highSigma, double lowSigma);
 
 /**
  * Shows an image in the screen
@@ -49,6 +64,13 @@ Mat computeConvolution(Mat &m, double sigma);
  * @param wn Name of the window
  */
 void drawImage(Mat &m, string wn);
+
+/**
+ * Draws an hybrid image and the two original images
+ * 
+ * @param m Vector with images to draw
+ */
+void drawHybrid(const std::vector<Mat> &m);
 
 #endif	/* UTILS_H */
 
