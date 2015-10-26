@@ -54,7 +54,7 @@ Mat convolutionOperator1D(Mat &signalVector, Mat &kernel, BorderTypes border) {
         for (vector<Mat>::const_iterator it = signalVectorByChannels.begin(); it != signalVectorByChannels.end(); ++it) {
             Mat m = *(it);
             // Create a new Mat with the extra borders needed
-            Mat signalWithBorder(1, m.cols + extraBorder, m.type());
+            Mat signalWithBorder;
             // Add extra borders to the vector to solve boundary issue
             copyMakeBorder(m, signalWithBorder, 0, 0, extraBorder, extraBorder, border, Scalar(0));
             // Vector to store the convolution result
