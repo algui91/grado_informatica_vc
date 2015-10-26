@@ -72,5 +72,13 @@ void drawImage(Mat &m, string wn);
  */
 void drawHybrid(const std::vector<Mat> &m);
 
+/**
+ * Draws a Gaussian pyramid with the given levels
+ * 
+ * @param hybrid Hybrid images
+ * @param levels Levels of the pyramid
+ */
+void gaussianPyramid(Mat &hybrid, int levels);
+
 #endif	/* UTILS_H */
 

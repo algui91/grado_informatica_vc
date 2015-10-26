@@ -115,7 +115,7 @@ Mat computeConvolution(Mat &m, double sigma, bool highpass) {
 vector<Mat> hybridImage(Mat &highFreq, Mat &lowFreq, double highSigma, double lowSigma) {
 
     vector<Mat> result;
-    
+
     Mat highBlurred = computeConvolution(highFreq, highSigma, true); // high pass filter
     Mat lowBlurred = computeConvolution(lowFreq, lowSigma); // low pass filter
 
@@ -124,11 +124,11 @@ vector<Mat> hybridImage(Mat &highFreq, Mat &lowFreq, double highSigma, double lo
 
     // Generate the hybrid image
     Mat H = lowBlurred + highH;
-    
+
     result.push_back(H);
     result.push_back(highH);
     result.push_back(lowBlurred);
-    
+
     return result;
 }
 
@@ -162,7 +162,8 @@ void drawHybrid(const std::vector<Mat> &m) {
 
         // Create a Mat to store all the images
         Mat result(height, width, CV_8UC3);
-
+        // Black background
+        result = 0;
         int x = 0;
         for (std::vector<Mat>::const_iterator it = m.begin(); it != m.end(); ++it) {
             Mat item = (*it);
@@ -176,4 +177,17 @@ void drawHybrid(const std::vector<Mat> &m) {
         }
         drawImage(result, "Ventana");
     }
+}
+
+//////////////////////////////////////////////////////
+
+void gaussianPyramid(Mat &hybrid, int levels) {
+    vector<Mat> pyramid;
+    pyramid.push_back(hybrid);
+    for (int i = 0; i < levels; i++) {
+        Mat r;
+        pyrDown(pyramid.at(i), r);
+        pyramid.push_back(r);
+    }
+    drawHybrid(pyramid);
 }

@@ -79,41 +79,50 @@ int main(int argc, char** argv) {
 
         std::vector<Mat> hybrid = hybridImage(high, low, 12, 20);
         drawHybrid(hybrid);
-
+        
         cout << "Press enter to show the next hybrid image" << endl;
 
         low = imread("./images/marilyn.bmp", IMREAD_UNCHANGED);
         high = imread("./images/einstein.bmp", IMREAD_UNCHANGED);
 
-        hybrid = hybridImage(high, low, 25, 8);
-        drawHybrid(hybrid);
+        std::vector<Mat> hybrid2 = hybridImage(high, low, 25, 8);
+        drawHybrid(hybrid2);
 
         cout << "Press enter to show the next hybrid image" << endl;
 
         low = imread("./images/fish.bmp", IMREAD_UNCHANGED);
         high = imread("./images/submarine.bmp", IMREAD_UNCHANGED);
 
-        hybrid = hybridImage(high, low, 12, 8);
-        drawHybrid(hybrid);
+        std::vector<Mat> hybrid3 = hybridImage(high, low, 12, 8);
+        drawHybrid(hybrid3);
 
         cout << "Press enter to show the next hybrid image" << endl;
 
         low = imread("./images/motorcycle.bmp", IMREAD_UNCHANGED);
         high = imread("./images/bicycle.bmp", IMREAD_UNCHANGED);
 
-        hybrid = hybridImage(high, low, 15, 8);
-        drawHybrid(hybrid);
+        std::vector<Mat> hybrid4 = hybridImage(high, low, 15, 8);
+        drawHybrid(hybrid4);
 
         low = imread("./images/bird.bmp", IMREAD_UNCHANGED);
         high = imread("./images/plane.bmp", IMREAD_UNCHANGED);
 
-        hybrid = hybridImage(high, low, 15, 6);
-        drawHybrid(hybrid);
+        std::vector<Mat> hybrid5 = hybridImage(high, low, 15, 6);
+        drawHybrid(hybrid5);
 
         cout << "Press enter to show the next hybrid image" << endl;
 
         cout << "Press enter to show the next exercise result" << endl;
         cin.get();
+
+        // Ercercise five
+        gaussianPyramid(hybrid.at(0), 7);
+        gaussianPyramid(hybrid2.at(0), 7);
+        gaussianPyramid(hybrid3.at(0), 7);
+        gaussianPyramid(hybrid4.at(0), 7);
+        gaussianPyramid(hybrid5.at(0), 7);
     }
+
+
     return 0;
 }
