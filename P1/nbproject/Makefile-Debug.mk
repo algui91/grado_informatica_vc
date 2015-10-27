@@ -43,8 +43,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-m64 -pedantic -Wall -Wextra
+CXXFLAGS=-m64 -pedantic -Wall -Wextra
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -66,12 +66,12 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/p1: ${OBJECTFILES}
 ${OBJECTDIR}/Utils.o: Utils.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include `pkg-config --cflags opencv`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Utils.o Utils.cpp
+	$(COMPILE.cc) -g -Werror -I/usr/local/include `pkg-config --cflags opencv` -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Utils.o Utils.cpp
 
 ${OBJECTDIR}/main.o: main.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include `pkg-config --cflags opencv`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -g -Werror -I/usr/local/include `pkg-config --cflags opencv` -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 # Subprojects
 .build-subprojects:

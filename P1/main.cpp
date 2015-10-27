@@ -16,14 +16,14 @@
 using namespace std;
 using namespace cv;
 
-int main(int argc, char** argv) {
+int main() {
 
     bool debug = false;
 
     // Exercise one, compute Gaussian kernel
     double sigma = 3;
     Mat kernel = myGetGaussianKernel1D(sigma);
-    
+
     if (!debug) {
         cout << "EXCERSICE ONE RESULT: (with sigma=" << sigma << ")" << endl;
         cout << setw(15) << "Kernel: " << kernel << endl;
@@ -69,16 +69,12 @@ int main(int argc, char** argv) {
     if (!debug) {
         cout << "EXCERSICE FOUR RESULT:" << endl;
 
-        // low = marylin, high = einstein, 25, 8
-        // low = dog, high = cat, 20, 12
-        // low = fish, high = submarine, 8, 12
-        // low = motorcycle, high = bicycle, 8, 15
-        // low = bird, high = plane, 6, 15
-
+        double sigma1 = 7;
+        double sigma2 = 10;
         Mat low = imread("./images/dog.bmp", IMREAD_UNCHANGED);
         Mat high = imread("./images/cat.bmp", IMREAD_UNCHANGED);
 
-        std::vector<Mat> hybrid = hybridImage(high, low, 12, 20);
+        std::vector<Mat> hybrid = hybridImage(high, low, sigma1, sigma2);
         drawHybrid(hybrid);
 
         cout << "Press enter to show the next hybrid image" << endl;
@@ -86,29 +82,36 @@ int main(int argc, char** argv) {
         low = imread("./images/marilyn.bmp", IMREAD_UNCHANGED);
         high = imread("./images/einstein.bmp", IMREAD_UNCHANGED);
 
-        std::vector<Mat> hybrid2 = hybridImage(high, low, 25, 8);
+        sigma1 = 3;
+        sigma2 = 5.5;
+        std::vector<Mat> hybrid2 = hybridImage(high, low, sigma1, sigma2);
         drawHybrid(hybrid2);
 
         cout << "Press enter to show the next hybrid image" << endl;
 
+        sigma1 = 3;
+        sigma2 = 7;
         low = imread("./images/fish.bmp", IMREAD_UNCHANGED);
         high = imread("./images/submarine.bmp", IMREAD_UNCHANGED);
 
-        std::vector<Mat> hybrid3 = hybridImage(high, low, 12, 8);
+        std::vector<Mat> hybrid3 = hybridImage(high, low, sigma1, sigma2);
         drawHybrid(hybrid3);
-
         cout << "Press enter to show the next hybrid image" << endl;
 
+        sigma1 = 3;
+        sigma2 = 7;
         low = imread("./images/motorcycle.bmp", IMREAD_UNCHANGED);
         high = imread("./images/bicycle.bmp", IMREAD_UNCHANGED);
 
-        std::vector<Mat> hybrid4 = hybridImage(high, low, 15, 8);
+        std::vector<Mat> hybrid4 = hybridImage(high, low, sigma1, sigma2);
         drawHybrid(hybrid4);
 
+        sigma1 = 5;
+        sigma2 = 3;
         low = imread("./images/bird.bmp", IMREAD_UNCHANGED);
         high = imread("./images/plane.bmp", IMREAD_UNCHANGED);
 
-        std::vector<Mat> hybrid5 = hybridImage(high, low, 15, 6);
+        std::vector<Mat> hybrid5 = hybridImage(high, low, sigma1, sigma2);
         drawHybrid(hybrid5);
 
         cout << "Press enter to show the next hybrid image" << endl;

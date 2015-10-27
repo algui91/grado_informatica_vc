@@ -38,9 +38,13 @@
       </toolsSet>
       <compileType>
         <ccTool>
+          <architecture>2</architecture>
+          <standard>8</standard>
           <incDir>
             <pElem>/usr/local/include</pElem>
           </incDir>
+          <commandLine>-pedantic -Wall -Wextra</commandLine>
+          <warningLevel>3</warningLevel>
         </ccTool>
         <linkerTool>
           <linkerAddLib>
