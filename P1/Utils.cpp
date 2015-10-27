@@ -11,24 +11,24 @@
 
 Mat myGetGaussianKernel1D(double sigma, bool highpass) {
 
-    // Kernel size
-    int ksize = 2 * sigma + 1;
+    // Kernel size [-sigma, +sigma]
+    int ksize = 2 * 3 * floor(sigma) + 1;
 
     Mat kernel(1, ksize, CV_64F);
 
     // Compute the mask with the given sigma
-    double ssum = 0;
-    for (int i = -sigma; i <= sigma; i++) {
-        // i+sigma to start at index 0
-        int index = i + sigma;
+    int middle = ksize/2;
+
+    // Fill the kernel symmetrically
+    for (int i = 0; i <= middle; i++) {
         double gaussian = (double) exp(-.5 * ((i * i) / (sigma * sigma)));
-        kernel.at<double>(index) = highpass ? 1 - gaussian : gaussian;
-        ssum += kernel.at<double>(index);
+        kernel.at<double>(i+middle) = highpass ? 1 - gaussian : gaussian;
+        kernel.at<double>(middle-i) = kernel.at<double>(i+middle);
     }
 
     // Normalize the kernel to sum 1, it is a smooth kernel
-    kernel = kernel * (1 / ssum);
-
+    kernel = kernel * (1 / *(sum(kernel).val));    
+        
     return kernel;
 }
 

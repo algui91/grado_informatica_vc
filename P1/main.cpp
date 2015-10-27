@@ -21,8 +21,9 @@ int main(int argc, char** argv) {
     bool debug = false;
 
     // Exercise one, compute Gaussian kernel
-    double sigma = 10;
+    double sigma = 3;
     Mat kernel = myGetGaussianKernel1D(sigma);
+    
     if (!debug) {
         cout << "EXCERSICE ONE RESULT: (with sigma=" << sigma << ")" << endl;
         cout << setw(15) << "Kernel: " << kernel << endl;
