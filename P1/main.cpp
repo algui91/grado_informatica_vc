@@ -49,8 +49,8 @@ int main() {
     // Exercise three
     if (!debug) {
         cout << "EXCERSICE THREE RESULT:" << endl;
-        Mat colorImage = imread("./images/dog.bmp", IMREAD_UNCHANGED);
-        Mat grayImage = imread("./images/dog.bmp", IMREAD_GRAYSCALE);
+        Mat colorImage = imread("./imagenes/dog.bmp", IMREAD_UNCHANGED);
+        Mat grayImage = imread("./imagenes/dog.bmp", IMREAD_GRAYSCALE);
 
         drawImage(colorImage, "Before Convolution | ColorImage");
         drawImage(grayImage, "Before Convolution | GrayImage");
@@ -71,16 +71,16 @@ int main() {
 
         double sigma1 = 7;
         double sigma2 = 10;
-        Mat low = imread("./images/dog.bmp", IMREAD_UNCHANGED);
-        Mat high = imread("./images/cat.bmp", IMREAD_UNCHANGED);
+        Mat low = imread("./imagenes/dog.bmp", IMREAD_UNCHANGED);
+        Mat high = imread("./imagenes/cat.bmp", IMREAD_UNCHANGED);
 
         std::vector<Mat> hybrid = hybridImage(high, low, sigma1, sigma2);
         drawHybrid(hybrid);
 
         cout << "Press enter to show the next hybrid image" << endl;
 
-        low = imread("./images/marilyn.bmp", IMREAD_UNCHANGED);
-        high = imread("./images/einstein.bmp", IMREAD_UNCHANGED);
+        low = imread("./imagenes/marilyn.bmp", IMREAD_UNCHANGED);
+        high = imread("./imagenes/einstein.bmp", IMREAD_UNCHANGED);
 
         sigma1 = 3;
         sigma2 = 5.5;
@@ -91,8 +91,8 @@ int main() {
 
         sigma1 = 3;
         sigma2 = 7;
-        low = imread("./images/fish.bmp", IMREAD_UNCHANGED);
-        high = imread("./images/submarine.bmp", IMREAD_UNCHANGED);
+        low = imread("./imagenes/fish.bmp", IMREAD_UNCHANGED);
+        high = imread("./imagenes/submarine.bmp", IMREAD_UNCHANGED);
 
         std::vector<Mat> hybrid3 = hybridImage(high, low, sigma1, sigma2);
         drawHybrid(hybrid3);
@@ -100,16 +100,16 @@ int main() {
 
         sigma1 = 3;
         sigma2 = 7;
-        low = imread("./images/motorcycle.bmp", IMREAD_UNCHANGED);
-        high = imread("./images/bicycle.bmp", IMREAD_UNCHANGED);
+        low = imread("./imagenes/motorcycle.bmp", IMREAD_UNCHANGED);
+        high = imread("./imagenes/bicycle.bmp", IMREAD_UNCHANGED);
 
         std::vector<Mat> hybrid4 = hybridImage(high, low, sigma1, sigma2);
         drawHybrid(hybrid4);
 
         sigma1 = 5;
         sigma2 = 3;
-        low = imread("./images/bird.bmp", IMREAD_UNCHANGED);
-        high = imread("./images/plane.bmp", IMREAD_UNCHANGED);
+        low = imread("./imagenes/bird.bmp", IMREAD_UNCHANGED);
+        high = imread("./imagenes/plane.bmp", IMREAD_UNCHANGED);
 
         std::vector<Mat> hybrid5 = hybridImage(high, low, sigma1, sigma2);
         drawHybrid(hybrid5);
