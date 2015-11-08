@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     srand(time(NULL));
     
     // Read and show in a window lena
-    Mat im = imread("./lena.jpg", 1);
+    Mat im = imread("./lena.jpg", IMREAD_COLOR);
     vector<Point> a = points9(im);
     drawCross(im, a);
     grid16(im);
