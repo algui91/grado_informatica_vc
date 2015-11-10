@@ -4,8 +4,30 @@
 
 cv::Mat mu::normalize(cv::Mat_<double>& p) {
 
-    cv::Mat_<double> T(3, 3);
-
+//    cv::Point2d m1c(0,0);
+//    
+//    // compute centers and average distances for each of the two point sets
+//    for(int i = 0; i < p.rows; i++ )
+//    {
+//        double x = p(i,0), y = p(i,1);
+//        m1c.x += x; m1c.y += y;
+//    }
+//    
+//    double t = 1./p.rows;
+//    m1c.x *= t; m1c.y *= t;
+//
+//    double scale1 = 0;
+//    for(int i = 0; i < p.rows; i++ )
+//    {
+//        double x = p(i,0) - m1c.x, y = p(i,1) - m1c.y;
+//        scale1 += std::sqrt(x*x + y*y);
+//    }
+//
+//    scale1 *= t;
+//
+//    scale1 = std::sqrt(2.)/scale1;
+    cv::Mat_<double> T(3,3, 0.0);
+    
     // means
     double xmean = *(cv::mean(p.col(0)).val);
     double ymean = *(cv::mean(p.col(1)).val);
@@ -36,7 +58,7 @@ cv::Mat mu::normalize(cv::Mat_<double>& p) {
     for (int i = 0; i < p.rows; i++) {
         p.row(i) = p.row(i) * T;
     }
-
+    
     return T;
 }
 

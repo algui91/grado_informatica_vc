@@ -53,7 +53,7 @@ int main() {
     
     Mat img3;
     warpPerspective(img1, img3, H, img1.size());
-
+    
     imshow("Original", img1);
     imshow("Projection", img2);
     imshow("WarpPerspectivr", img3);
@@ -81,7 +81,7 @@ int main() {
     p2(21) = 102;  p2(22) = 392;    p2(23) = 1;
     p2(24) = 129;  p2(25) = 371;    p2(26) = 1;
     p2(27) = 124;  p2(28) = 396;    p2(29) = 1;
-    
+//    
     // Normalize points
     T = mu::normalize(p1);
     T2 = mu::normalize(p2);
@@ -100,14 +100,13 @@ int main() {
     
     
     // If using findhomography, denormalize points
-    //    Mat img3;
-    //    Mat H2 = findHomography(p1, p2, RANSAC);
-    ////
-    //    warpPerspective(img1, img3, H2, img1.size());
-    ////    
-    //    imshow("Projection1", img3);
-    //    imshow("Original1", img1);
-    //    waitKey(0);
+//        Mat H2 = findHomography(p1, p2, RANSAC);
+//    //
+//        warpPerspective(img1, img3, H2, img1.size());
+//    //    
+//        imshow("Projection1", img3);
+//        imshow("Original1", img1);
+//        waitKey(0);
     //    
     ////    cout << H2 << endl;
     ////    
