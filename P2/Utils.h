@@ -45,6 +45,8 @@ namespace mu {
      * @return A normalized transformation matrix H
      */
     cv::Mat dlt(cv::Mat_<double> &p1, cv::Mat_<double> &p2);
+    
+    void runDetector(const std::string &detectorType, cv::Mat &img1, cv::Mat &img2);
 }
 
 #endif	/* UTILS_H */
