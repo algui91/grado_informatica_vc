@@ -52,18 +52,20 @@ int main() {
     p2(24) = 111;  p2(25) = 190;    p2(26) = 1;
     p2(27) = 472;  p2(28) = 259;    p2(29) = 1;
 
-    // Normalize points
-    Mat T = mu::normalize(p1);
-    Mat T2 = mu::normalize(p2);
-        
-    // Get a Normalized Homography
-    Mat Hn = mu::dlt(p1,p2);
-    // Denormalize
-    Mat H = T.inv() * Hn * T2;
+    // Get a Homography
+    Mat H = mu::dlt(p1,p2);
     
     Mat img3;
     warpPerspective(img1, img3, H, img1.size());
     
+    imshow("Original", img1);
+    imshow("Projection", img2);
+    imshow("WarpPerspectivr", img3);
+    waitKey(0);
+    
+//    H = findHomography(p1, p2, img3, RANSAC);
+//    warpPerspective(img1, img3, H, img1.size());
+////
 //    imshow("Original", img1);
 //    imshow("Projection", img2);
 //    imshow("WarpPerspectivr", img3);
@@ -91,23 +93,6 @@ int main() {
     p2(21) = 102;  p2(22) = 392;    p2(23) = 1;
     p2(24) = 129;  p2(25) = 371;    p2(26) = 1;
     p2(27) = 124;  p2(28) = 396;    p2(29) = 1;
-//    
-    // Normalize points
-    T = mu::normalize(p1);
-    T2 = mu::normalize(p2);
-        
-    // Get a Normalized Homography
-    Hn = mu::dlt(p1,p2);
-    // Denormalize
-    H = T.inv() * Hn * T2;
-    
-    warpPerspective(img1, img3, H, img1.size());
-//
-//    imshow("Original", img1);
-//    imshow("Projection", img2);
-//    imshow("WarpPerspectivr", img3);
-//    waitKey(0);
-    
    
     // EXERCISE 2
 
