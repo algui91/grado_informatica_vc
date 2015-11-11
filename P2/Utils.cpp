@@ -113,7 +113,6 @@ cv::Mat mu::dlt(cv::Mat_<double> &p1, cv::Mat_<double> &p2) {
 
 void mu::runDetector(const std::string &detectorType, cv::Mat &img1, cv::Mat &img2) {
     
-    // Detectors to use
     /**
      * Notes on params for BRISK
      * With a threshold of 30, too many points are detected, we've have increased 
@@ -141,18 +140,13 @@ void mu::runDetector(const std::string &detectorType, cv::Mat &img1, cv::Mat &im
         detector = ORB::create(1500,1.2f, 13);
     }
     
-    vector<DMatch> matches;
     vector<KeyPoint> keypoints1, keypoints2;
 
-    detector->detect(img1, keypoints1);
     Mat descriptors1, descriptors2;
-    detector->compute(img1, keypoints1, descriptors1);
+    
+    detector->detectAndCompute(img1, Mat(), keypoints1, descriptors1, false);
     detector->detectAndCompute(img2, Mat(), keypoints2, descriptors2, false);
 
-    Ptr<DescriptorMatcher> descriptorMatcher = DescriptorMatcher::create("BruteForce-Hamming(2)");
-    
-    descriptorMatcher->match(descriptors1, descriptors2, matches, Mat());
-    
     Mat result;    
     drawKeypoints(img1, keypoints1, result);
     
@@ -164,6 +158,4 @@ void mu::runDetector(const std::string &detectorType, cv::Mat &img1, cv::Mat &im
     namedWindow(detectorType, WINDOW_AUTOSIZE);
     imshow(detectorType, result);
     waitKey();
-    
-    
 }
