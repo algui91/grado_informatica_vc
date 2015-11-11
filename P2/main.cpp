@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <iomanip>
 
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
@@ -110,102 +111,29 @@ int main() {
    
     // EXERCISE 2
 
-//    img1 = imread("./imagenes/Yosemite1.jpg", IMREAD_GRAYSCALE);
-//    img2 = imread("./imagenes/Yosemite2.jpg", IMREAD_GRAYSCALE);
-
-//    
-//    Ptr<Feature2D> detector = BRISK::create();
-//    
-//    vector<DMatch> matches;
-//    vector<KeyPoint> keypoints1, keypoints2;
-//
-//    detector->detect(img1, keypoints1);
-//    Mat descriptors1, descriptors2;
-//    detector->compute(img1, keypoints1, descriptors1);
-//    detector->detectAndCompute(img2, Mat(), keypoints2, descriptors2, false);
-//
-//    Ptr<DescriptorMatcher> descriptorMatcher = DescriptorMatcher::create("BruteForce-Hamming");
-//    
-//    descriptorMatcher->match(descriptors1, descriptors2, matches, Mat());
-//    
-//    // Keep best matches only to have a nice drawing.
-//    // We sort distance between descriptor matches
-//    Mat index;
-//    int nbMatch = int(matches.size());
-//    Mat tab(nbMatch, 1, CV_32F);
-//    for (int i = 0; i < nbMatch; i++) {
-//        DMatch dm = matches[i];
-//        tab.at<float>(i, 0) = dm.distance;
-//    }
-//    sortIdx(tab, index, SORT_EVERY_COLUMN + SORT_ASCENDING);
-//    vector<DMatch> bestMatches;
-//    for (int i = 0; i < 30; i++) {
-//        bestMatches.push_back(matches[index.at<int>(i, 0)]);
-//    }
-//    
-//    Mat result;
-//    drawMatches(img1, keypoints1, img2, keypoints2, bestMatches, result);
-//    namedWindow("BRISK:FlannBased", WINDOW_AUTOSIZE);
-//    imshow("BRISK:FlannBased", result);
-//    waitKey();
-
-    vector<String> detectorsTypes;
-    vector<int> briskThresholdParams;
-    vector<int> briskOctavesParams;
-    vector<int> orbNFeaturesParams;
-    vector<int> orbnLevelsParams;
-    
-    // This descriptor are going to be detect and compute
-    detectorsTypes.push_back("BRISK");
-//    detectorsTypes.push_back("ORB");
-
-    
+    vector<String> detectors;
+    // Detectors to use
     /**
-     * Notes on params
+     * Notes on params for BRISK
      * With a threshold of 30, too many points are detected, we've have increased 
      * this number up to 70 an seems to give good results, with octaves between 7 and 8.
      * 
      * This detector seems to detect good match more vertically than ORB
-     * @return 
+     * 
+     * We pick 70,8
      */
-    briskThresholdParams.push_back(10);
-    briskThresholdParams.push_back(20);
-    briskThresholdParams.push_back(25);
-    briskThresholdParams.push_back(30);
-    briskThresholdParams.push_back(35);
-    briskThresholdParams.push_back(40);
-    briskThresholdParams.push_back(45);
-    briskThresholdParams.push_back(50);
-    briskThresholdParams.push_back(70);
-    briskOctavesParams.push_back(3);
-    briskOctavesParams.push_back(4);
-    briskOctavesParams.push_back(5);
-    briskOctavesParams.push_back(6);
-    briskOctavesParams.push_back(7);
-    briskOctavesParams.push_back(8);
-    
+    detectors.push_back("BRISK");
     
     /**
-     * Notes on params
+     * Notes on params for ORB
      * ORB seems to work better with 13 octaves, and any number of nfeature, maybe with 1300 better
      * when nfeatures is 500, it is common to have failure matching. 
      * 
      * For this, we think a good param is 13 octaves, and above 1000 nfeatures
-     * @return 
+     * 
+     * We pick 1500, 8
      */
-    orbNFeaturesParams.push_back(500);
-    orbNFeaturesParams.push_back(700);
-    orbNFeaturesParams.push_back(900);
-    orbNFeaturesParams.push_back(1100);
-    orbNFeaturesParams.push_back(1300);
-    orbNFeaturesParams.push_back(1500);
-    orbnLevelsParams.push_back(8);
-    orbnLevelsParams.push_back(9);
-    orbnLevelsParams.push_back(10);
-    orbnLevelsParams.push_back(11);
-    orbnLevelsParams.push_back(12);
-    orbnLevelsParams.push_back(13);
-    // 1500 13 good
+    detectors.push_back("ORB");
 
     img1 = imread("./imagenes/Yosemite1.jpg", IMREAD_GRAYSCALE);
     img2 = imread("./imagenes/Yosemite2.jpg", IMREAD_GRAYSCALE);
@@ -217,101 +145,57 @@ int main() {
 
     Ptr<Feature2D> detector;
 
-    vector<String>::iterator itDetectorsTypes;
+    vector<String>::iterator itDetectors;
     
     // Iterate over all detectors specified 
-    for (itDetectorsTypes = detectorsTypes.begin(); itDetectorsTypes != detectorsTypes.end(); itDetectorsTypes++) {
+    for (itDetectors = detectors.begin(); itDetectors != detectors.end(); itDetectors++) {
+
         Ptr<DescriptorMatcher> descriptorMatcher;
         // Match between img1 and img2
         vector<DMatch> matches;
         // keypoint  for img1 and img2
-        vector<KeyPoint> keyImg1, keyImg2;
+        vector<KeyPoint> keyPoint1, keyPoint2;
         // Descriptor for img1 and img2
         Mat descImg1, descImg2;
 
-        vector<int>::iterator itParam1;
-        vector<int>::iterator itParam1end;
-        vector<int>::iterator itParam2;
-        vector<int>::iterator itParam2end;
-
-        if (*itDetectorsTypes == "ORB") {
-            itParam1 = orbNFeaturesParams.begin();
-            itParam1end = orbNFeaturesParams.end();
-            itParam2 = orbnLevelsParams.begin();
-            itParam2end = orbnLevelsParams.end();
-        } else if (*itDetectorsTypes == "BRISK") {
-            itParam1 = briskThresholdParams.begin();
-            itParam1end = briskThresholdParams.end();
-            itParam2 = briskOctavesParams.begin();
-            itParam2end = briskOctavesParams.end();
+        if (*itDetectors == "ORB") {
+            detector = ORB::create(1500, 1.2, 8);
+        } else if (*itDetectors == "BRISK") {
+            detector = BRISK::create(70, 8);
         }
 
-        vector<int>::iterator reset = itParam1;
+        // Detect keypoints and compute descriptors for images
+        detector->detectAndCompute(img1, 0, keyPoint1, descImg1, false);
+        detector->detectAndCompute(img2, 0, keyPoint2, descImg2, false);
 
-        for (; itParam2 != itParam2end; itParam2++) {
-            itParam1 = reset;
-            for (; itParam1 != itParam1end; itParam1++) {
+        descriptorMatcher = DescriptorMatcher::create("BruteForce-Hamming(2)");
+        descriptorMatcher->match(descImg1, descImg2, matches);
 
-                if (*itDetectorsTypes == "ORB") {
-                    detector = ORB::create(*itParam1, 1.2, *itParam2);
-                } else if (*itDetectorsTypes == "BRISK") {
-                    detector = BRISK::create(*itParam1, *itParam2);
-                }
-
-                // Detect keypoints for images
-                detector->detectAndCompute(img1, Mat(), keyImg1, descImg1, false);
-                detector->detectAndCompute(img2, Mat(), keyImg2, descImg2, false);
-
-                descriptorMatcher = DescriptorMatcher::create("BruteForce-Hamming(2)");
-                descriptorMatcher->match(descImg1, descImg2, matches, Mat());
-                // Keep best matches only to have a nice drawing.
-                // We sort distance between descriptor matches
-                Mat index;
-                int nbMatch = int(matches.size());
-                Mat tab(nbMatch, 1, CV_32F);
-                for (int i = 0; i < nbMatch; i++) {
-                    DMatch dm = matches[i];
-                    tab.at<float>(i, 0) = dm.distance;
-                }
-                sortIdx(tab, index, SORT_EVERY_COLUMN + SORT_ASCENDING);
-                vector<DMatch> bestMatches;
-                for (int i = 0; i < 50; i++) {
-                    bestMatches.push_back(matches[index.at<int>(i, 0)]);
-                }
-                Mat result;
-
-                drawMatches(img1, keyImg1, img2, keyImg2, bestMatches, result);
-                String name = *itDetectorsTypes + ": BruteForce-Hamming(2) thr: " + to_string(*itParam1) + " o:" + to_string(*itParam2);
-//                namedWindow(name, WINDOW_AUTOSIZE);
-//                imshow(name, result);
-                imwrite(name+".jpg", result);
-                vector<DMatch>::iterator it;
-                cout << "**********Match results**********\n";
-                cout << "Index \tIndex \tdistance\n";
-                cout << "img1 \timg2\n";
-                // Use to compute distance between keyPoint matches and to evaluate match algorithm
-//                for (it = bestMatches.begin(); it != bestMatches.end(); it++) {
-//                    DMatch dm = *(it);
-//                    cout << dm.queryIdx << "\t" << dm.trainIdx << "\t" << dm.distance << "\n";
-//                }
-//                waitKey();
-
-            }
+        // Compute what are the best matches for drawing lines point to point
+        Mat index;
+        int n = int(matches.size());
+        
+        // Store the distance attribute of the match for sort them latter
+        Mat_<float> distances(n, 1);
+        for (int i = 0; i < n; i++) {
+            DMatch dm = matches[i];
+            distances(i) = dm.distance;;
         }
+        // Sort the distances ascending
+        sortIdx(distances, index, SORT_EVERY_COLUMN + SORT_ASCENDING);
+        vector<DMatch> bestMatches;
+        // Keep only the 50 best matches to draw lines between them
+        for (int i = 0; i < 50; i++) {
+            bestMatches.push_back(matches[index.at<int>(i, 0)]);
+        }
+        Mat result;
+
+        drawMatches(img1, keyPoint1, img2, keyPoint2, bestMatches, result);
+        String name = *itDetectors + ", BruteForce-Hamming(2)";
+        namedWindow(name, WINDOW_AUTOSIZE);
+        imshow(name, result);
+        waitKey();
     }
-    
-    // If using findhomography, denormalize points
-//        Mat H2 = findHomography(p1, p2, RANSAC);
-//    //
-//        warpPerspective(img1, img3, H2, img1.size());
-//    //    
-//        imshow("Projection1", img3);
-//        imshow("Original1", img1);
-//        waitKey(0);
-    //    
-    ////    cout << H2 << endl;
-    ////    
-    //    waitKey(0);
     
     return 0;
 }
