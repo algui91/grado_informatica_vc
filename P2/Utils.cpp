@@ -174,78 +174,25 @@ void mu::matching(const string &descriptorMatcherType, Mat &descriptor1, Mat &de
     Mat img1 = imread("./imagenes/Yosemite1.jpg", IMREAD_GRAYSCALE);
     Mat img2 = imread("./imagenes/Yosemite2.jpg", IMREAD_GRAYSCALE);
 
-    img1.empty();
-    img2.empty();
-    descriptorMatcherType.size();
-    descriptor1.empty();
-    descriptor2.empty();
-    kp1.empty();
-    kp2.empty();
-    //
+
     if (descriptorMatcherType == "BruteForce+Cross") {
+
         BFMatcher matcher(NORM_HAMMING, true);
+        vector<DMatch> matches;
+        matcher.match(descriptor1, descriptor2, matches);
 
-//        vector <DMatch> nn_matches;
-//
-//        matcher.match(descriptor1, descriptor2, nn_matches);
-//
-//        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, nn_matches);
+        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, mu::goodMatches(matches, 50));
 
 
-        vector<DMatch> filteredMatches12, matches12, matches21;
-        matcher.match(descriptor1, descriptor2, matches12);
-        matcher.match(descriptor2, descriptor1, matches21);
-        
-        for (size_t i = 0; i < matches12.size(); i++) {
-            DMatch forward = matches12[i];
-            DMatch backward = matches21[forward.trainIdx];
-            
-            LOG_MESSAGE(abs(forward.distance/backward.distance))
-            if(abs(forward.distance/backward.distance) < 0.624){
-                filteredMatches12.push_back(forward);
-            }
-//            if (backward.trainIdx == forward.queryIdx)
-//                filteredMatches12.push_back(forward);
-        }
-        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, filteredMatches12);
-        
+    } else if (descriptorMatcherType == "FlannBased") {
+        // Match between img1 and img2
+        vector <DMatch> matches;
 
+        FlannBasedMatcher matcher(new flann::LshIndexParams(10, 10, 2));
+        matcher.match(descriptor1, descriptor2, matches);
+
+        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, mu::goodMatches(matches, 50));
     }
-
-
-    //        // We will use only brute force and FlannBased
-    //        Ptr<DescriptorMatcher> descriptorMatcher;
-    //        // Match between img1 and img2
-    //        vector<DMatch> matches;
-    //    
-    //        descriptorMatcher = DescriptorMatcher::create("BruteForce-Hamming");
-    //        descriptorMatcher->match(descriptor1, descriptor2, matches);
-    //    
-    //        // Compute what are the best matches for drawing lines point to point
-    //        Mat index;
-    //        int n = int(matches.size());
-    //    
-    //        // Store the distance attribute of the match for sort them latter
-    //        Mat_<float> distances(n, 1);
-    //        for (int i = 0; i < n; i++) {
-    //            DMatch dm = matches[i];
-    //            distances(i) = dm.distance;
-    //        }
-    //        // Sort the distances ascending
-    //        sortIdx(distances, index, SORT_EVERY_COLUMN + SORT_ASCENDING);
-    //        vector<DMatch> bestMatches;
-    //        // Keep only the 50 best matches to draw lines between them
-    //        for (int i = 0; i < 50; i++) {
-    //            bestMatches.push_back(matches[index.at<int>(i, 0)]);
-    //        }
-    //        Mat result;
-    //    
-    //        drawMatches(img1, kp1, img2, kp2, bestMatches, result);
-    //        String name = descriptorMatcherType;
-    //        namedWindow(name, WINDOW_AUTOSIZE);
-    //        imshow(name, result);
-    //        waitKey();
-
 }
 
 void mu::myDrawMatches(const string &descriptorMatcherType, Mat& img1, vector<KeyPoint>& kp1, Mat& img2, vector<KeyPoint>& kp2, vector<DMatch> matches) {
@@ -255,4 +202,27 @@ void mu::myDrawMatches(const string &descriptorMatcherType, Mat& img1, vector<Ke
     namedWindow(name, WINDOW_AUTOSIZE);
     imshow(name, res);
     waitKey();
+}
+
+vector<DMatch> mu::goodMatches(vector<DMatch> &matches, int size) {
+
+    // Compute what are the best matches for drawing lines point to point
+    Mat index;
+    int n = int(matches.size());
+
+    // Store the distance attribute of the match for sort them latter
+    Mat_<float> distances(n, 1);
+    for (int i = 0; i < n; i++) {
+        DMatch dm = matches[i];
+        distances(i) = dm.distance;
+    }
+    // Sort the distances ascending
+    sortIdx(distances, index, SORT_EVERY_COLUMN + SORT_ASCENDING);
+    vector<DMatch> bestMatches;
+    // Keep only the 50 best matches to draw lines between them
+    for (int i = 0; i < size; i++) {
+        bestMatches.push_back(matches[index.at<int>(i, 0)]);
+    }
+    
+    return bestMatches;
 }

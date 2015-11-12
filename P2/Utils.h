@@ -52,6 +52,7 @@ namespace mu {
     void runDetector(const string &detectorType, Mat &descriptor1, Mat &descriptor2, vector<KeyPoint> &kp1, vector<KeyPoint> &kp2);
     void matching(const string &descriptorMatcherType, Mat &descriptor1, Mat &descriptor2, vector<KeyPoint> &kp1, vector<KeyPoint> &kp2);
     void myDrawMatches(const string &descriptorMatcherType, Mat &img1, vector<KeyPoint> &kp1, Mat &img2, vector<KeyPoint> &kp2, vector<DMatch> matches);
+    vector<DMatch> goodMatches(vector<DMatch> &matches, int size);
    
 }
 

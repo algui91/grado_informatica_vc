@@ -99,12 +99,13 @@ int main() {
     vector<KeyPoint> keypoints1, keypoints2;
     Mat descriptors1, descriptors2;
     
-    mu::runDetector("BRISK", descriptors1, descriptors2, keypoints1, keypoints2);
-//    mu::runDetector("ORB", descriptors1, descriptors2, keypoints1, keypoints2);
+//    mu::runDetector("BRISK", descriptors1, descriptors2, keypoints1, keypoints2);
+    mu::runDetector("ORB", descriptors1, descriptors2, keypoints1, keypoints2);
     
     // Exercise 3
     
     mu::matching("BruteForce+Cross", descriptors1, descriptors2, keypoints1, keypoints2);
+    mu::matching("FlannBased", descriptors1, descriptors2, keypoints1, keypoints2);
     
     return 0;
 }
