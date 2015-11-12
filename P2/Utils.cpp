@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <opencv2/core.hpp>
 
 #include <opencv2/imgproc.hpp>
@@ -8,6 +10,14 @@
 
 using namespace cv;
 using namespace std;
+
+#define _DEBUG 1
+
+#if _DEBUG
+#define LOG_MESSAGE(x) cout << __FILE__ << " (" << __LINE__ << "): " << x << endl;
+#else
+#define LOG_MESSAGE(x)
+#endif
 
 cv::Mat mu::normalize(cv::Mat_<double>& p) {
 
@@ -175,11 +185,31 @@ void mu::matching(const string &descriptorMatcherType, Mat &descriptor1, Mat &de
     if (descriptorMatcherType == "BruteForce+Cross") {
         BFMatcher matcher(NORM_HAMMING, true);
 
-        vector <DMatch> nn_matches;
+//        vector <DMatch> nn_matches;
+//
+//        matcher.match(descriptor1, descriptor2, nn_matches);
+//
+//        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, nn_matches);
 
-        matcher.match(descriptor1, descriptor2, nn_matches);
 
-        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, nn_matches);
+        vector<DMatch> filteredMatches12, matches12, matches21;
+        matcher.match(descriptor1, descriptor2, matches12);
+        matcher.match(descriptor2, descriptor1, matches21);
+        
+        for (size_t i = 0; i < matches12.size(); i++) {
+            DMatch forward = matches12[i];
+            DMatch backward = matches21[forward.trainIdx];
+            
+            LOG_MESSAGE(abs(forward.distance/backward.distance))
+            if(abs(forward.distance/backward.distance) < 0.624){
+                filteredMatches12.push_back(forward);
+            }
+//            if (backward.trainIdx == forward.queryIdx)
+//                filteredMatches12.push_back(forward);
+        }
+        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, filteredMatches12);
+        
+
     }
 
 
