@@ -9,6 +9,9 @@
 #define	UTILS_H
 
 namespace mu {
+    
+    using namespace cv;
+    using namespace std;
     /**
      * Normalize the points using the Matrix T:
      *  T = s   \begin{pmatrix}
@@ -23,7 +26,7 @@ namespace mu {
      * 
      * @return A normalization matrix T
      */
-    cv::Mat normalize(cv::Mat_<double> &p1);
+    Mat normalize(Mat_<double> &p1);
     
     /**
      * A Direct Linear Transformation implentation.
@@ -44,9 +47,12 @@ namespace mu {
      * 
      * @return A normalized transformation matrix H
      */
-    cv::Mat dlt(cv::Mat_<double> &p1, cv::Mat_<double> &p2);
+    Mat dlt(Mat_<double> &p1, Mat_<double> &p2);
     
-    void runDetector(const std::string &detectorType, cv::Mat &img1, cv::Mat &img2);
+    void runDetector(const string &detectorType, Mat &descriptor1, Mat &descriptor2, vector<KeyPoint> &kp1, vector<KeyPoint> &kp2);
+    void matching(const string &descriptorMatcherType, Mat &descriptor1, Mat &descriptor2, vector<KeyPoint> &kp1, vector<KeyPoint> &kp2);
+    void myDrawMatches(const string &descriptorMatcherType, Mat &img1, vector<KeyPoint> &kp1, Mat &img2, vector<KeyPoint> &kp2, vector<DMatch> matches);
+   
 }
 
 #endif	/* UTILS_H */

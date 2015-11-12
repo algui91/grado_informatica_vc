@@ -96,13 +96,15 @@ int main() {
    
     // EXERCISE 2
 
-    img1 = imread("./imagenes/Yosemite1.jpg", IMREAD_GRAYSCALE);
-    img2 = imread("./imagenes/Yosemite2.jpg", IMREAD_GRAYSCALE);
+    vector<KeyPoint> keypoints1, keypoints2;
+    Mat descriptors1, descriptors2;
     
-    mu::runDetector("BRISK", img1, img2);
-    mu::runDetector("ORB", img1, img2);
+    mu::runDetector("BRISK", descriptors1, descriptors2, keypoints1, keypoints2);
+//    mu::runDetector("ORB", descriptors1, descriptors2, keypoints1, keypoints2);
     
     // Exercise 3
+    
+    mu::matching("BruteForce+Cross", descriptors1, descriptors2, keypoints1, keypoints2);
     
     return 0;
 }

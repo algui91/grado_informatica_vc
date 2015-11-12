@@ -111,8 +111,8 @@ cv::Mat mu::dlt(cv::Mat_<double> &p1, cv::Mat_<double> &p2) {
     return Hn;
 }
 
-void mu::runDetector(const std::string &detectorType, cv::Mat &img1, cv::Mat &img2) {
-    
+void mu::runDetector(const std::string &detectorType, Mat &descriptor1, Mat &descriptor2, vector<KeyPoint> &kp1, vector<KeyPoint> &kp2) {
+
     /**
      * Notes on params for BRISK
      * With a threshold of 30, too many points are detected, we've have increased 
@@ -131,31 +131,98 @@ void mu::runDetector(const std::string &detectorType, cv::Mat &img1, cv::Mat &im
      * 
      * We pick 1500, 8
      */
-    
+
+    Mat img1 = imread("./imagenes/Yosemite1.jpg", IMREAD_GRAYSCALE);
+    Mat img2 = imread("./imagenes/Yosemite2.jpg", IMREAD_GRAYSCALE);
+
     Ptr<Feature2D> detector;
-    
-    if (detectorType == "BRISK"){
-        detector = BRISK::create(70,8);
-    } else if (detectorType == "ORB"){
-        detector = ORB::create(1500,1.2f, 13);
+
+    if (detectorType == "BRISK") {
+        detector = BRISK::create(70, 8);
+    } else if (detectorType == "ORB") {
+        detector = ORB::create(1500, 1.2f, 13);
     }
-    
-    vector<KeyPoint> keypoints1, keypoints2;
 
-    Mat descriptors1, descriptors2;
-    
-    detector->detectAndCompute(img1, Mat(), keypoints1, descriptors1, false);
-    detector->detectAndCompute(img2, Mat(), keypoints2, descriptors2, false);
+    detector->detectAndCompute(img1, Mat(), kp1, descriptor1, false);
+    detector->detectAndCompute(img2, Mat(), kp2, descriptor2, false);
 
-    Mat result;    
-    drawKeypoints(img1, keypoints1, result);
-    
+    Mat result;
+    drawKeypoints(img1, kp1, result);
+
     namedWindow(detectorType, WINDOW_AUTOSIZE);
     imshow(detectorType, result);
     waitKey();
-    
-    drawKeypoints(img2, keypoints2, result);
+
+    drawKeypoints(img2, kp2, result);
     namedWindow(detectorType, WINDOW_AUTOSIZE);
     imshow(detectorType, result);
+    waitKey();
+}
+
+void mu::matching(const string &descriptorMatcherType, Mat &descriptor1, Mat &descriptor2, vector<KeyPoint> &kp1, vector<KeyPoint> &kp2) {
+
+    Mat img1 = imread("./imagenes/Yosemite1.jpg", IMREAD_GRAYSCALE);
+    Mat img2 = imread("./imagenes/Yosemite2.jpg", IMREAD_GRAYSCALE);
+
+    img1.empty();
+    img2.empty();
+    descriptorMatcherType.size();
+    descriptor1.empty();
+    descriptor2.empty();
+    kp1.empty();
+    kp2.empty();
+    //
+    if (descriptorMatcherType == "BruteForce+Cross") {
+        BFMatcher matcher(NORM_HAMMING, true);
+
+        vector <DMatch> nn_matches;
+
+        matcher.match(descriptor1, descriptor2, nn_matches);
+
+        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, nn_matches);
+    }
+
+
+    //        // We will use only brute force and FlannBased
+    //        Ptr<DescriptorMatcher> descriptorMatcher;
+    //        // Match between img1 and img2
+    //        vector<DMatch> matches;
+    //    
+    //        descriptorMatcher = DescriptorMatcher::create("BruteForce-Hamming");
+    //        descriptorMatcher->match(descriptor1, descriptor2, matches);
+    //    
+    //        // Compute what are the best matches for drawing lines point to point
+    //        Mat index;
+    //        int n = int(matches.size());
+    //    
+    //        // Store the distance attribute of the match for sort them latter
+    //        Mat_<float> distances(n, 1);
+    //        for (int i = 0; i < n; i++) {
+    //            DMatch dm = matches[i];
+    //            distances(i) = dm.distance;
+    //        }
+    //        // Sort the distances ascending
+    //        sortIdx(distances, index, SORT_EVERY_COLUMN + SORT_ASCENDING);
+    //        vector<DMatch> bestMatches;
+    //        // Keep only the 50 best matches to draw lines between them
+    //        for (int i = 0; i < 50; i++) {
+    //            bestMatches.push_back(matches[index.at<int>(i, 0)]);
+    //        }
+    //        Mat result;
+    //    
+    //        drawMatches(img1, kp1, img2, kp2, bestMatches, result);
+    //        String name = descriptorMatcherType;
+    //        namedWindow(name, WINDOW_AUTOSIZE);
+    //        imshow(name, result);
+    //        waitKey();
+
+}
+
+void mu::myDrawMatches(const string &descriptorMatcherType, Mat& img1, vector<KeyPoint>& kp1, Mat& img2, vector<KeyPoint>& kp2, vector<DMatch> matches) {
+    Mat res;
+    drawMatches(img1, kp1, img2, kp2, matches, res);
+    String name = descriptorMatcherType;
+    namedWindow(name, WINDOW_AUTOSIZE);
+    imshow(name, res);
     waitKey();
 }
