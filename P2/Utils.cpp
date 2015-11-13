@@ -8,9 +8,6 @@
 
 #include "Utils.h"
 
-using namespace cv;
-using namespace std;
-
 #define _DEBUG 1
 
 #if _DEBUG
@@ -121,7 +118,7 @@ cv::Mat mu::dlt(cv::Mat_<double> &p1, cv::Mat_<double> &p2) {
     return Hn;
 }
 
-void mu::runDetector(const std::string &detectorType, Mat &descriptor1, Mat &descriptor2, vector<KeyPoint> &kp1, vector<KeyPoint> &kp2) {
+void mu::runDetector(const std::string &detectorType, cv::Mat &descriptor1, cv::Mat &descriptor2, std::vector<cv::KeyPoint> &kp1, std::vector<cv::KeyPoint> &kp2) {
 
     /**
      * Notes on params for BRISK
@@ -142,43 +139,43 @@ void mu::runDetector(const std::string &detectorType, Mat &descriptor1, Mat &des
      * We pick 1500, 8
      */
 
-    Mat img1 = imread("./imagenes/Yosemite1.jpg", IMREAD_GRAYSCALE);
-    Mat img2 = imread("./imagenes/Yosemite2.jpg", IMREAD_GRAYSCALE);
+    cv::Mat img1 = cv::imread("./imagenes/Yosemite1.jpg", cv::IMREAD_GRAYSCALE);
+    cv::Mat img2 = cv::imread("./imagenes/Yosemite2.jpg", cv::IMREAD_GRAYSCALE);
 
-    Ptr<Feature2D> detector;
+    cv::Ptr<cv::Feature2D> detector;
 
     if (detectorType == "BRISK") {
-        detector = BRISK::create(70, 8);
+        detector = cv::BRISK::create(70, 8);
     } else if (detectorType == "ORB") {
-        detector = ORB::create(1500, 1.2f, 13);
+        detector = cv::ORB::create(1500, 1.2f, 13);
     }
 
-    detector->detectAndCompute(img1, Mat(), kp1, descriptor1, false);
-    detector->detectAndCompute(img2, Mat(), kp2, descriptor2, false);
+    detector->detectAndCompute(img1, cv::Mat(), kp1, descriptor1, false);
+    detector->detectAndCompute(img2, cv::Mat(), kp2, descriptor2, false);
 
-    Mat result;
-    drawKeypoints(img1, kp1, result);
+    cv::Mat result;
+    cv::drawKeypoints(img1, kp1, result);
+    
+    cv::namedWindow(detectorType, cv::WINDOW_AUTOSIZE);
+    cv::imshow(detectorType, result);
+    cv::waitKey();
 
-    namedWindow(detectorType, WINDOW_AUTOSIZE);
-    imshow(detectorType, result);
-    waitKey();
-
-    drawKeypoints(img2, kp2, result);
-    namedWindow(detectorType, WINDOW_AUTOSIZE);
-    imshow(detectorType, result);
-    waitKey();
+    cv::drawKeypoints(img2, kp2, result);
+    cv::namedWindow(detectorType, cv::WINDOW_AUTOSIZE);
+    cv::imshow(detectorType, result);
+    cv::waitKey();
 }
 
-void mu::matching(const string &descriptorMatcherType, Mat &descriptor1, Mat &descriptor2, vector<KeyPoint> &kp1, vector<KeyPoint> &kp2) {
+void mu::matching(const std::string &descriptorMatcherType, cv::Mat &descriptor1, cv::Mat &descriptor2, std::vector<cv::KeyPoint> &kp1, std::vector<cv::KeyPoint> &kp2) {
 
-    Mat img1 = imread("./imagenes/Yosemite1.jpg", IMREAD_GRAYSCALE);
-    Mat img2 = imread("./imagenes/Yosemite2.jpg", IMREAD_GRAYSCALE);
+    cv::Mat img1 = cv::imread("./imagenes/Yosemite1.jpg", cv::IMREAD_GRAYSCALE);
+    cv::Mat img2 = cv::imread("./imagenes/Yosemite2.jpg", cv::IMREAD_GRAYSCALE);
 
 
     if (descriptorMatcherType == "BruteForce+Cross") {
 
-        BFMatcher matcher(NORM_HAMMING, true);
-        vector<DMatch> matches;
+        cv::BFMatcher matcher(cv::NORM_HAMMING, true);
+        std::vector<cv::DMatch> matches;
         matcher.match(descriptor1, descriptor2, matches);
 
         myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, mu::goodMatches(matches, 50));
@@ -186,39 +183,39 @@ void mu::matching(const string &descriptorMatcherType, Mat &descriptor1, Mat &de
 
     } else if (descriptorMatcherType == "FlannBased") {
         // Match between img1 and img2
-        vector <DMatch> matches;
+        std::vector <cv::DMatch> matches;
 
-        FlannBasedMatcher matcher(new flann::LshIndexParams(10, 10, 2));
+        cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(10, 10, 2));
         matcher.match(descriptor1, descriptor2, matches);
 
         myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, mu::goodMatches(matches, 50));
     }
 }
 
-void mu::myDrawMatches(const string &descriptorMatcherType, Mat& img1, vector<KeyPoint>& kp1, Mat& img2, vector<KeyPoint>& kp2, vector<DMatch> matches) {
-    Mat res;
-    drawMatches(img1, kp1, img2, kp2, matches, res);
-    String name = descriptorMatcherType;
-    namedWindow(name, WINDOW_AUTOSIZE);
-    imshow(name, res);
-    waitKey();
+void mu::myDrawMatches(const std::string &descriptorMatcherType, cv::Mat& img1, std::vector<cv::KeyPoint>& kp1, cv::Mat& img2, std::vector<cv::KeyPoint>& kp2, std::vector<cv::DMatch> matches) {
+    cv::Mat res;
+    cv::drawMatches(img1, kp1, img2, kp2, matches, res);
+    cv::String name = descriptorMatcherType;
+    cv::namedWindow(name, cv::WINDOW_AUTOSIZE);
+    cv::imshow(name, res);
+    cv::waitKey();
 }
 
-vector<DMatch> mu::goodMatches(vector<DMatch> &matches, int size) {
+std::vector<cv::DMatch> mu::goodMatches(std::vector<cv::DMatch> &matches, int size) {
 
     // Compute what are the best matches for drawing lines point to point
-    Mat index;
+    cv::Mat index;
     int n = int(matches.size());
 
     // Store the distance attribute of the match for sort them latter
-    Mat_<float> distances(n, 1);
+    cv::Mat_<float> distances(n, 1);
     for (int i = 0; i < n; i++) {
-        DMatch dm = matches[i];
+        cv::DMatch dm = matches[i];
         distances(i) = dm.distance;
     }
     // Sort the distances ascending
-    sortIdx(distances, index, SORT_EVERY_COLUMN + SORT_ASCENDING);
-    vector<DMatch> bestMatches;
+    cv::sortIdx(distances, index, cv::SORT_EVERY_COLUMN + cv::SORT_ASCENDING);
+    std::vector<cv::DMatch> bestMatches;
     // Keep only the 50 best matches to draw lines between them
     for (int i = 0; i < size; i++) {
         bestMatches.push_back(matches[index.at<int>(i, 0)]);

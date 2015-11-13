@@ -8,10 +8,6 @@
 
 #include "Utils.h"
 
-using namespace cv;
-using namespace std;
-
-
 #define _DEBUG 1
 
 #if _DEBUG
@@ -20,19 +16,20 @@ using namespace std;
 #define LOG_MESSAGE(x)
 #endif
 
-#define MEASURE_TIME(x)                        \
-        { auto startTime = cv::getTickCount(); \ 
-          x;                                   \
-          auto endTime = cv::getTickCount();   \
-          std::cout << #x << " " << (endTime - startTime) * cv::getTickFrequency() << std::endl; }
+#define MEASURE_TIME(x) {\
+    auto startTime = cv::getTickCount(); \
+    x;                                   \
+    auto endTime = cv::getTickCount();   \
+    std::cout << #x << " " << (endTime - startTime) * cv::getTickFrequency() << std::endl;\
+    }
 
 int main() {
 
-    Mat img1 = imread("./imagenes/Tablero1.jpg", IMREAD_GRAYSCALE);
-    Mat img2 = imread("./imagenes/Tablero2.jpg", IMREAD_GRAYSCALE);
+    cv::Mat img1 = cv::imread("./imagenes/Tablero1.jpg", cv::IMREAD_GRAYSCALE);
+    cv::Mat img2 = cv::imread("./imagenes/Tablero2.jpg", cv::IMREAD_GRAYSCALE);
     
     // Manually pick points in the images to stablish correspondences
-    Mat_<double> p1(10,3);
+    cv::Mat_<double> p1(10,3);
 
     p1(0) = 156;   p1(1) = 47;      p1(2) = 1;
     p1(3) = 532;   p1(4) = 13;      p1(5) = 1;
@@ -45,7 +42,7 @@ int main() {
     p1(24) = 146;  p1(25) = 220;    p1(26) = 1;
     p1(27) = 533;  p1(28) = 219;    p1(29) = 1;
 
-    Mat_<double> p2(10,3);
+    cv::Mat_<double> p2(10,3);
     
     p2(0) = 148;   p2(1) = 14;      p2(2)  = 1;
     p2(3) = 503;   p2(4) = 95;      p2(5)  = 1;
@@ -59,10 +56,10 @@ int main() {
     p2(27) = 472;  p2(28) = 259;    p2(29) = 1;
 
     // Get a Homography
-    Mat H = mu::dlt(p1,p2);
+    cv::Mat H = mu::dlt(p1,p2);
     
-    Mat img3;
-    warpPerspective(img1, img3, H, img1.size());
+    cv::Mat img3;
+    cv::warpPerspective(img1, img3, H, img1.size());
     
 //    imshow("Original", img1);
 //    imshow("Projection", img2);
@@ -102,8 +99,8 @@ int main() {
    
     // EXERCISE 2
 
-    vector<KeyPoint> keypoints1, keypoints2;
-    Mat descriptors1, descriptors2;
+    std::vector<cv::KeyPoint> keypoints1, keypoints2;
+    cv::Mat descriptors1, descriptors2;
     
     mu::runDetector("BRISK", descriptors1, descriptors2, keypoints1, keypoints2);
     mu::runDetector("ORB", descriptors1, descriptors2, keypoints1, keypoints2);
