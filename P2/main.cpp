@@ -20,6 +20,12 @@ using namespace std;
 #define LOG_MESSAGE(x)
 #endif
 
+#define MEASURE_TIME(x)                        \
+        { auto startTime = cv::getTickCount(); \ 
+          x;                                   \
+          auto endTime = cv::getTickCount();   \
+          std::cout << #x << " " << (endTime - startTime) * cv::getTickFrequency() << std::endl; }
+
 int main() {
 
     Mat img1 = imread("./imagenes/Tablero1.jpg", IMREAD_GRAYSCALE);
@@ -99,7 +105,7 @@ int main() {
     vector<KeyPoint> keypoints1, keypoints2;
     Mat descriptors1, descriptors2;
     
-//    mu::runDetector("BRISK", descriptors1, descriptors2, keypoints1, keypoints2);
+    mu::runDetector("BRISK", descriptors1, descriptors2, keypoints1, keypoints2);
     mu::runDetector("ORB", descriptors1, descriptors2, keypoints1, keypoints2);
     
     // Exercise 3
