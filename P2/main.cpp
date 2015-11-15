@@ -5,10 +5,12 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/calib3d.hpp>
+#include <opencv2/stitching.hpp>
 
 #include "Utils.h"
 
 #define _DEBUG 1
+#define _RELEASE 0
 
 #if _DEBUG
 #define LOG_MESSAGE(x) std::cout << __FILE__ << " (" << __LINE__ << "): " << x << std::endl;
@@ -27,7 +29,7 @@ int main() {
 
     cv::Mat img1 = cv::imread("./imagenes/Tablero1.jpg", cv::IMREAD_GRAYSCALE);
     cv::Mat img2 = cv::imread("./imagenes/Tablero2.jpg", cv::IMREAD_GRAYSCALE);
-    
+
     // Manually pick points in the images to stablish correspondences
     cv::Mat_<double> p1(10,3);
 
@@ -60,11 +62,13 @@ int main() {
     
     cv::Mat img3;
     cv::warpPerspective(img1, img3, H, img1.size());
-    
-//    imshow("Original", img1);
-//    imshow("Projection", img2);
-//    imshow("WarpPerspectivr", img3);
-//    waitKey(0);
+
+    if (_RELEASE) {
+        cv::imshow("Original", img1);
+        cv::imshow("Projection", img2);
+        cv::imshow("WarpPerspectivr", img3);
+        cv::waitKey(0);
+    }
     
 //    H = findHomography(p1, p2, img3, RANSAC);
 //    warpPerspective(img1, img3, H, img1.size());
@@ -98,7 +102,6 @@ int main() {
     p2(27) = 124;  p2(28) = 396;    p2(29) = 1;
    
     // EXERCISE 2
-
     std::vector<cv::KeyPoint> keypoints1, keypoints2;
     cv::Mat descriptors1, descriptors2;
     
@@ -106,9 +109,21 @@ int main() {
     mu::runDetector("ORB", descriptors1, descriptors2, keypoints1, keypoints2);
     
     // Exercise 3
+    std::vector<cv::DMatch> matchPoints1 = mu::matching("BruteForce+Cross", descriptors1, descriptors2, keypoints1, keypoints2);
+    std::vector<cv::DMatch> matchPoints2 = mu::matching("FlannBased", descriptors1, descriptors2, keypoints1, keypoints2);
+
+    // Exercise 4
+    img1 = cv::imread("./imagenes/yosemite_full/yosemite1.jpg", cv::IMREAD_GRAYSCALE);
+    img2 = cv::imread("./imagenes/yosemite_full/yosemite2.jpg", cv::IMREAD_GRAYSCALE);
     
-    mu::matching("BruteForce+Cross", descriptors1, descriptors2, keypoints1, keypoints2);
-    mu::matching("FlannBased", descriptors1, descriptors2, keypoints1, keypoints2);
+    std::vector<cv::Mat> images;
+    images.push_back(img1);
+    images.push_back(img2);
+    
+    mu::composePanorama(images,  matchPoints1, keypoints1, keypoints2);
+    mu::composePanorama(images,  matchPoints2, keypoints1, keypoints2);
+    
+    // Exercise 5
     
     return 0;
 }

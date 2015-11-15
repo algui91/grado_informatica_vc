@@ -9,6 +9,7 @@
 #include "Utils.h"
 
 #define _DEBUG 1
+#define _RELEASE 0
 
 #if _DEBUG
 #define LOG_MESSAGE(x) cout << __FILE__ << " (" << __LINE__ << "): " << x << endl;
@@ -76,7 +77,7 @@ cv::Mat mu::normalize(cv::Mat_<double>& p) {
     return T;
 }
 
-cv::Mat mu::dlt(cv::Mat_<double> &p1, cv::Mat_<double> &p2) {
+cv::Mat mu::dlt(const cv::Mat_<double> &p1, const cv::Mat_<double> &p2) {
 
     cv::Mat A(2 * p1.rows, 9, CV_64F);
 
@@ -153,55 +154,60 @@ void mu::runDetector(const std::string &detectorType, cv::Mat &descriptor1, cv::
     detector->detectAndCompute(img1, cv::Mat(), kp1, descriptor1, false);
     detector->detectAndCompute(img2, cv::Mat(), kp2, descriptor2, false);
 
-    cv::Mat result;
-    cv::drawKeypoints(img1, kp1, result);
-    
-    cv::namedWindow(detectorType, cv::WINDOW_AUTOSIZE);
-    cv::imshow(detectorType, result);
-    cv::waitKey();
+    if (_RELEASE) {
+        cv::Mat result;
+        cv::drawKeypoints(img1, kp1, result);
 
-    cv::drawKeypoints(img2, kp2, result);
-    cv::namedWindow(detectorType, cv::WINDOW_AUTOSIZE);
-    cv::imshow(detectorType, result);
-    cv::waitKey();
+        cv::namedWindow(detectorType, cv::WINDOW_AUTOSIZE);
+        cv::imshow(detectorType, result);
+        cv::waitKey();
+
+        cv::drawKeypoints(img2, kp2, result);
+        cv::namedWindow(detectorType, cv::WINDOW_AUTOSIZE);
+        cv::imshow(detectorType, result);
+        cv::waitKey();
+    }
 }
 
-void mu::matching(const std::string &descriptorMatcherType, cv::Mat &descriptor1, cv::Mat &descriptor2, std::vector<cv::KeyPoint> &kp1, std::vector<cv::KeyPoint> &kp2) {
+std::vector<cv::DMatch> mu::matching(const std::string &descriptorMatcherType, cv::Mat &descriptor1, cv::Mat &descriptor2, std::vector<cv::KeyPoint> &kp1, std::vector<cv::KeyPoint> &kp2) {
 
     cv::Mat img1 = cv::imread("./imagenes/Yosemite1.jpg", cv::IMREAD_GRAYSCALE);
     cv::Mat img2 = cv::imread("./imagenes/Yosemite2.jpg", cv::IMREAD_GRAYSCALE);
 
+    std::vector<cv::DMatch> goodMatches;
 
     if (descriptorMatcherType == "BruteForce+Cross") {
-
         cv::BFMatcher matcher(cv::NORM_HAMMING, true);
         std::vector<cv::DMatch> matches;
         matcher.match(descriptor1, descriptor2, matches);
-
-        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, mu::goodMatches(matches, 50));
-
-
+        goodMatches = mu::goodMatches(matches, 50);
+        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, goodMatches);
     } else if (descriptorMatcherType == "FlannBased") {
         // Match between img1 and img2
         std::vector <cv::DMatch> matches;
-
         cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(10, 10, 2));
         matcher.match(descriptor1, descriptor2, matches);
+        goodMatches = mu::goodMatches(matches, 50);
+        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, goodMatches);
+    }
 
-        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, mu::goodMatches(matches, 50));
+    return goodMatches;
+}
+
+void mu::myDrawMatches(const std::string &descriptorMatcherType, const cv::Mat& img1,
+        const std::vector<cv::KeyPoint>& kp1, const cv::Mat& img2, const std::vector<cv::KeyPoint>& kp2,
+        const std::vector<cv::DMatch> matches) {
+    if (_RELEASE) {
+        cv::Mat res;
+        cv::drawMatches(img1, kp1, img2, kp2, matches, res);
+        cv::String name = descriptorMatcherType;
+        cv::namedWindow(name, cv::WINDOW_AUTOSIZE);
+        cv::imshow(name, res);
+        cv::waitKey();
     }
 }
 
-void mu::myDrawMatches(const std::string &descriptorMatcherType, cv::Mat& img1, std::vector<cv::KeyPoint>& kp1, cv::Mat& img2, std::vector<cv::KeyPoint>& kp2, std::vector<cv::DMatch> matches) {
-    cv::Mat res;
-    cv::drawMatches(img1, kp1, img2, kp2, matches, res);
-    cv::String name = descriptorMatcherType;
-    cv::namedWindow(name, cv::WINDOW_AUTOSIZE);
-    cv::imshow(name, res);
-    cv::waitKey();
-}
-
-std::vector<cv::DMatch> mu::goodMatches(std::vector<cv::DMatch> &matches, int size) {
+const std::vector<cv::DMatch> mu::goodMatches(const std::vector<cv::DMatch> &matches, int size) {
 
     // Compute what are the best matches for drawing lines point to point
     cv::Mat index;
@@ -220,6 +226,44 @@ std::vector<cv::DMatch> mu::goodMatches(std::vector<cv::DMatch> &matches, int si
     for (int i = 0; i < size; i++) {
         bestMatches.push_back(matches[index.at<int>(i, 0)]);
     }
-    
+
     return bestMatches;
+}
+
+void mu::composePanorama(const std::vector<cv::Mat> &images, const std::vector<cv::DMatch> &matchs, 
+        const std::vector<cv::KeyPoint> &kp1, const std::vector<cv::KeyPoint> &kp2) {
+
+    std::vector<cv::Point2f> points1;
+    std::vector<cv::Point2f> points2;
+    cv::Mat img1 = images.at(0);
+    cv::Mat img2 = images.at(1);
+
+    for (uint i = 0; i < matchs.size(); i++) {
+        points1.push_back(kp1[ matchs[i].queryIdx ].pt);
+        points2.push_back(kp2[ matchs[i].trainIdx ].pt);
+    }
+
+    cv::Mat_<double> cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+    cameraMatrix(2) = img1.rows; // Where start drawing
+
+    cv::Mat result;
+    cv::Size size = cv::Size(img1.cols + img2.cols, img1.rows);
+    cv::warpPerspective(img2, result, cameraMatrix, size);
+
+    // Find the Homography Matrix
+    cv::Mat H = cv::findHomography(points1, points2, CV_RANSAC, 1);
+    H = cameraMatrix * H; // Compose the two homographies
+    // Use the Homography Matrix to warp the images
+    cv::warpPerspective(img1, result, H, size, cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+
+    // Remove black borders
+    while (*(cv::sum(result.col(0))).val == 0) {
+        result = result.colRange(1, result.cols);
+    }
+    while (*(cv::sum(result.col(result.cols - 1))).val == 0) {
+        result = result.colRange(0, result.cols - 1);
+    }
+    
+    cv::imshow("Panorama", result);
+    cv::waitKey(0);
 }

@@ -9,7 +9,7 @@
 #define	UTILS_H
 
 namespace mu {
-    
+
     /**
      * Normalize the points using the Matrix T:
      *  T = s   \begin{pmatrix}
@@ -25,7 +25,7 @@ namespace mu {
      * @return A normalization matrix T
      */
     cv::Mat normalize(cv::Mat_<double> &p1);
-    
+
     /**
      * A Direct Linear Transformation implentation.
      * 
@@ -45,13 +45,16 @@ namespace mu {
      * 
      * @return A normalized transformation matrix H
      */
-    cv::Mat dlt(cv::Mat_<double> &p1, cv::Mat_<double> &p2);
-    
+    cv::Mat dlt(const cv::Mat_<double> &p1, const cv::Mat_<double> &p2);
+
     void runDetector(const std::string &detectorType, cv::Mat &descriptor1, cv::Mat &descriptor2, std::vector<cv::KeyPoint> &kp1, std::vector<cv::KeyPoint> &kp2);
-    void matching(const std::string &descriptorMatcherType, cv::Mat &descriptor1, cv::Mat &descriptor2, std::vector<cv::KeyPoint> &kp1, std::vector<cv::KeyPoint> &kp2);
-    void myDrawMatches(const std::string &descriptorMatcherType, cv::Mat &img1, std::vector<cv::KeyPoint> &kp1, cv::Mat &img2, std::vector<cv::KeyPoint> &kp2, std::vector<cv::DMatch> matches);
-    std::vector<cv::DMatch> goodMatches(std::vector<cv::DMatch> &matches, int size);
-   
+    std::vector<cv::DMatch> matching(const std::string &descriptorMatcherType, cv::Mat &descriptor1, cv::Mat &descriptor2, std::vector<cv::KeyPoint> &kp1, std::vector<cv::KeyPoint> &kp2);
+    void myDrawMatches(const std::string &descriptorMatcherType, const cv::Mat &img1,
+            const std::vector<cv::KeyPoint> &kp1, const cv::Mat &img2, const std::vector<cv::KeyPoint> &kp2,
+            const std::vector<cv::DMatch> matches);
+    const std::vector<cv::DMatch> goodMatches(const std::vector<cv::DMatch> &matches, int size);
+    void composePanorama(const std::vector<cv::Mat> &images, const std::vector<cv::DMatch> &matchs, const std::vector<cv::KeyPoint> &kp1, const std::vector<cv::KeyPoint> &kp2);
+
 }
 
 #endif	/* UTILS_H */
