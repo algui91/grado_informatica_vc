@@ -27,6 +27,8 @@
 
 int main() {
 
+    // Excersice 1
+    
     cv::Mat img1 = cv::imread("./imagenes/Tablero1.jpg", cv::IMREAD_GRAYSCALE);
     cv::Mat img2 = cv::imread("./imagenes/Tablero2.jpg", cv::IMREAD_GRAYSCALE);
 
@@ -70,13 +72,6 @@ int main() {
         cv::waitKey(0);
     }
     
-//    H = findHomography(p1, p2, img3, RANSAC);
-//    warpPerspective(img1, img3, H, img1.size());
-////
-//    imshow("Original", img1);
-//    imshow("Projection", img2);
-//    imshow("WarpPerspectivr", img3);
-//    waitKey(0);
 
     // Pick points again, this time very close together
     p1(0) = 139;   p1(1) = 344;     p1(2) = 1;
@@ -102,20 +97,23 @@ int main() {
     p2(27) = 124;  p2(28) = 396;    p2(29) = 1;
    
     // EXERCISE 2
+    img1 = cv::imread("./imagenes/Yosemite1.jpg", cv::IMREAD_GRAYSCALE);
+    img2 = cv::imread("./imagenes/Yosemite2.jpg", cv::IMREAD_GRAYSCALE);
+
     std::vector<cv::KeyPoint> keypoints1, keypoints2;
     cv::Mat descriptors1, descriptors2;
     
-    mu::runDetector("BRISK", descriptors1, descriptors2, keypoints1, keypoints2);
-    mu::runDetector("ORB", descriptors1, descriptors2, keypoints1, keypoints2);
+    mu::runDetector(img1, img2, "BRISK", descriptors1, descriptors2, keypoints1, keypoints2);
+    mu::runDetector(img1, img2, "ORB", descriptors1, descriptors2, keypoints1, keypoints2);
     
     // Exercise 3
-    std::vector<cv::DMatch> matchPoints1 = mu::matching("BruteForce+Cross", descriptors1, descriptors2, keypoints1, keypoints2);
-    std::vector<cv::DMatch> matchPoints2 = mu::matching("FlannBased", descriptors1, descriptors2, keypoints1, keypoints2);
+    std::vector<cv::DMatch> matchPoints1 = mu::matching(img1, img2, "BruteForce+Cross", descriptors1, descriptors2, keypoints1, keypoints2);
+    std::vector<cv::DMatch> matchPoints2 = mu::matching(img1, img2, "FlannBased", descriptors1, descriptors2, keypoints1, keypoints2);
 
     // Exercise 4
     img1 = cv::imread("./imagenes/yosemite_full/yosemite1.jpg", cv::IMREAD_GRAYSCALE);
     img2 = cv::imread("./imagenes/yosemite_full/yosemite2.jpg", cv::IMREAD_GRAYSCALE);
-    
+//    
     std::vector<cv::Mat> images;
     images.push_back(img1);
     images.push_back(img2);
@@ -124,6 +122,30 @@ int main() {
     mu::composePanorama(images,  matchPoints2, keypoints1, keypoints2);
     
     // Exercise 5
+    img1 = cv::imread("./imagenes/mosaico-1/mosaico002.jpg");
+    img2 = cv::imread("./imagenes/mosaico-1/mosaico003.jpg");
+    img3 = cv::imread("./imagenes/mosaico-1/mosaico004.jpg");
+    cv::Mat img4 = cv::imread("./imagenes/mosaico-1/mosaico005.jpg");
+    cv::Mat img5 = cv::imread("./imagenes/mosaico-1/mosaico006.jpg");
+    cv::Mat img6 = cv::imread("./imagenes/mosaico-1/mosaico007.jpg");
+    cv::Mat img7 = cv::imread("./imagenes/mosaico-1/mosaico008.jpg");
+    cv::Mat img8 = cv::imread("./imagenes/mosaico-1/mosaico009.jpg");
+    cv::Mat img9 = cv::imread("./imagenes/mosaico-1/mosaico010.jpg");
+    cv::Mat img10 = cv::imread("./imagenes/mosaico-1/mosaico011.jpg");
+    
+    images.clear();
+    images.push_back(img1);
+    images.push_back(img2);
+    images.push_back(img3);
+    images.push_back(img4);
+//    images.push_back(img5);
+//    images.push_back(img6);
+//    images.push_back(img7);
+//    images.push_back(img8);
+//    images.push_back(img9);
+//    images.push_back(img10);
+//    
+    mu::composePanorama(images);
     
     return 0;
 }
