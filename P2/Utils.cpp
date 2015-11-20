@@ -9,7 +9,7 @@
 #include "Utils.h"
 
 #define _DEBUG 1
-#define _RELEASE 0
+#define _RELEASE 1
 
 #if _DEBUG
 #define LOG_MESSAGE(x) std::cout << __FILE__ << " (" << __LINE__ << "): " << x << std::endl;
