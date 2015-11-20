@@ -28,7 +28,6 @@
 int main() {
 
     // Excersice 1
-    
     cv::Mat img1 = cv::imread("./imagenes/Tablero1.jpg", cv::IMREAD_GRAYSCALE);
     cv::Mat img2 = cv::imread("./imagenes/Tablero2.jpg", cv::IMREAD_GRAYSCALE);
 
@@ -67,7 +66,9 @@ int main() {
 
     if (_RELEASE) {
         cv::imshow("Original", img1);
+        cv::waitKey(0);
         cv::imshow("Projection", img2);
+        cv::waitKey(0);
         cv::imshow("WarpPerspectivr", img3);
         cv::waitKey(0);
     }
