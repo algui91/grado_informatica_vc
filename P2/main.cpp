@@ -34,6 +34,7 @@ int main() {
     // Manually pick points in the images to stablish correspondences
     cv::Mat_<double> p1(10,3);
 
+    //      x               y               z
     p1(0) = 156;   p1(1) = 47;      p1(2) = 1;
     p1(3) = 532;   p1(4) = 13;      p1(5) = 1;
     p1(6) = 137;   p1(7) = 422;     p1(8) = 1;
@@ -47,6 +48,7 @@ int main() {
 
     cv::Mat_<double> p2(10,3);
     
+    //      x               y               z
     p2(0) = 148;   p2(1) = 14;      p2(2)  = 1;
     p2(3) = 503;   p2(4) = 95;      p2(5)  = 1;
     p2(6) = 75;    p2(7) = 387;     p2(8)  = 1;
@@ -139,7 +141,7 @@ int main() {
     images.push_back(img2);
     images.push_back(img3);
     images.push_back(img4);
-//    images.push_back(img5);
+    images.push_back(img5);
 //    images.push_back(img6);
 //    images.push_back(img7);
 //    images.push_back(img8);

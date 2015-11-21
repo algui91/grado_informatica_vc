@@ -243,7 +243,7 @@ void mu::composePanorama(const std::vector<cv::Mat> &images, const std::vector<c
 
 void mu::composePanorama(const std::vector<cv::Mat> &images) {
 
-    cv::Mat H = cv::Mat::zeros(3, 3, CV_64F);
+    cv::Mat H = cv::Mat::eye(3, 3, CV_64F);
     uint i;
     int width = 0;
     int height = 0;
@@ -261,21 +261,42 @@ void mu::composePanorama(const std::vector<cv::Mat> &images) {
 
     // Center image
 
-    cv::Mat central = images.at(images.size() / 2);
-    cameraMatrix(2) += central.cols/2; // Where start drawing ( Center of camera optical center )
-    cameraMatrix(5) += central.rows/2; // Where start drawing ( Center of camera optical center )
+    cv::Mat central = images.at(2);
+    cameraMatrix(2) += central.cols / 2; // Where start drawing ( Center of camera optical center )
+    cameraMatrix(5) += central.rows / 2; // Where start drawing ( Center of camera optical center )
     cv::warpPerspective(central, result, cameraMatrix, result.size());
-    cv::imshow("First", result);
+    cv::imshow("c", result);
     cv::waitKey(0);
 
-    for (i = images.size()/2; i < images.size() - 1; i++) {
+    std::vector<cv::Point2f> points1;
+    std::vector<cv::Point2f> points2;
+
+    std::vector<cv::KeyPoint> keypoints1, keypoints2;
+    cv::Mat descriptors1, descriptors2;
+
+    cv::Mat img = images.at(3);
+
+    runDetector(central, img, "ORB", descriptors1, descriptors2, keypoints1, keypoints2);
+    std::vector<cv::DMatch> matchs = mu::matching(central, img, "FlannBased", descriptors1, descriptors2, keypoints1, keypoints2);
+
+    for (uint i = 0; i < matchs.size(); i++) {
+        points1.push_back(keypoints1[ matchs[i].queryIdx ].pt);
+        points2.push_back(keypoints2[ matchs[i].trainIdx ].pt);
+    }
+
+    // Find the Homography Matrix
+    cv::Mat H1 = cv::findHomography(points1, points2, CV_RANSAC, 1);
+    H = H1 * cameraMatrix * H; // Compose the two homographies
+    // Use the Homography Matrix to warp the images
+    cv::warpPerspective(central, result, H, result.size(), cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+    cv::imshow("2", result);
+    cv::waitKey(0);
+
+    for (i = ceil(images.size() / 2); i < images.size() - 1; i++) {
 
         cv::Mat img1 = images.at(i);
         cv::Mat img2 = images.at(i + 1);
 
-        cv::imshow("Img1", img1);
-        cv::imshow("Img2", img2);
-
         std::vector<cv::Point2f> points1;
         std::vector<cv::Point2f> points2;
 
@@ -292,54 +313,55 @@ void mu::composePanorama(const std::vector<cv::Mat> &images) {
 
         //        myDrawMatches("FSDFSFSDA", img1, keypoints1, img2, keypoints2, matchs);
         cameraMatrix(2) += img1.cols / 2; // Where start drawing ( Center of camera optical center)
-//        cameraMatrix(5) += img1.rows / 2; // Where start drawing ( Center of camera optical center)
-        cv::warpPerspective(img2, result, cameraMatrix, result.size());
-        cv::imshow("First", result);
-        cv::waitKey(0);
+        cameraMatrix(5) += img1.rows / 2; // Where start drawing ( Center of camera optical center)
+        cv::warpPerspective(img1, result, cameraMatrix, result.size());
+
         // Find the Homography Matrix
         cv::Mat H1 = cv::findHomography(points1, points2, CV_RANSAC, 1);
-        H = cameraMatrix * H * H1; // Compose the two homographies
+        H = H1 * cameraMatrix * H; // Compose the two homographies
         // Use the Homography Matrix to warp the images
         cv::warpPerspective(img1, result, H, result.size(), cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
 
-    }
-    
-    // From center to left
-    for (i = images.size()/2; i > 0; i--) {
-
-        cv::Mat img1 = images.at(i);
-        cv::Mat img2 = images.at(i - 1);
-
-        cv::imshow("Img1", img1);
-        cv::imshow("Img2", img2);
-
-        std::vector<cv::Point2f> points1;
-        std::vector<cv::Point2f> points2;
-
-        std::vector<cv::KeyPoint> keypoints1, keypoints2;
-        cv::Mat descriptors1, descriptors2;
-
-        runDetector(img1, img2, "ORB", descriptors1, descriptors2, keypoints1, keypoints2);
-        std::vector<cv::DMatch> matchs = mu::matching(img1, img2, "FlannBased", descriptors1, descriptors2, keypoints1, keypoints2);
-
-        for (uint i = 0; i < matchs.size(); i++) {
-            points1.push_back(keypoints1[ matchs[i].queryIdx ].pt);
-            points2.push_back(keypoints2[ matchs[i].trainIdx ].pt);
-        }
-
-        //        myDrawMatches("FSDFSFSDA", img1, keypoints1, img2, keypoints2, matchs);
-        cameraMatrix(2) += img1.cols / 2; // Where start drawing ( Center of camera optical center)
-//        cameraMatrix(5) += img1.rows / 2; // Where start drawing ( Center of camera optical center)
-        cv::warpPerspective(img2, result, cameraMatrix, result.size());
         cv::imshow("First", result);
         cv::waitKey(0);
-        // Find the Homography Matrix
-        cv::Mat H1 = cv::findHomography(points1, points2, CV_RANSAC, 1);
-        H = cameraMatrix * H * H1; // Compose the two homographies
-        // Use the Homography Matrix to warp the images
-        cv::warpPerspective(img1, result, H.inv(), result.size(), cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
-
     }
+
+    // From center to left
+    //    for (i = images.size() / 2; i > 0; i--) {
+    //
+    //        cv::Mat img1 = images.at(i);
+    //        cv::Mat img2 = images.at(i - 1);
+    //
+    //        cv::imshow("Img1", img1);
+    //        cv::imshow("Img2", img2);
+    //
+    //        std::vector<cv::Point2f> points1;
+    //        std::vector<cv::Point2f> points2;
+    //
+    //        std::vector<cv::KeyPoint> keypoints1, keypoints2;
+    //        cv::Mat descriptors1, descriptors2;
+    //
+    //        runDetector(img1, img2, "ORB", descriptors1, descriptors2, keypoints1, keypoints2);
+    //        std::vector<cv::DMatch> matchs = mu::matching(img1, img2, "FlannBased", descriptors1, descriptors2, keypoints1, keypoints2);
+    //
+    //        for (uint i = 0; i < matchs.size(); i++) {
+    //            points1.push_back(keypoints1[ matchs[i].queryIdx ].pt);
+    //            points2.push_back(keypoints2[ matchs[i].trainIdx ].pt);
+    //        }
+    //
+    //        //        myDrawMatches("FSDFSFSDA", img1, keypoints1, img2, keypoints2, matchs);
+    //        cameraMatrix(2) += img1.cols / 2; // Where start drawing ( Center of camera optical center)
+    //        //        cameraMatrix(5) += img1.rows / 2; // Where start drawing ( Center of camera optical center)
+    //        cv::warpPerspective(img2, result, cameraMatrix, result.size());
+    //        cv::imshow("First", result);
+    //        cv::waitKey(0);
+    //        // Find the Homography Matrix
+    //        cv::Mat H1 = cv::findHomography(points1, points2, CV_RANSAC, 1);
+    //        H = cameraMatrix * H * H1; // Compose the two homographies
+    //        // Use the Homography Matrix to warp the images
+    //        cv::warpPerspective(img1, result, H.inv(), result.size(), cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+    //
+    //    }
 
     // Remove black borders
     //    while (*(cv::sum(result.col(0))).val == 0) {
@@ -349,6 +371,4 @@ void mu::composePanorama(const std::vector<cv::Mat> &images) {
     //        result = result.colRange(0, result.cols - 1);
     //    }
 
-    cv::imshow("Panorama", result);
-    cv::waitKey(0);
 }
