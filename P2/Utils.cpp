@@ -9,7 +9,7 @@
 #include "Utils.h"
 
 #define _DEBUG 1
-#define _RELEASE 1
+#define _RELEASE 0
 
 #if _DEBUG
 #define LOG_MESSAGE(x) std::cout << __FILE__ << " (" << __LINE__ << "): " << x << std::endl;
@@ -286,7 +286,7 @@ void mu::composePanorama(const std::vector<cv::Mat> &images) {
 
     // Find the Homography Matrix
     cv::Mat H1 = cv::findHomography(points1, points2, CV_RANSAC, 1);
-    H = H1 * cameraMatrix * H; // Compose the two homographies
+    H = H1 * cameraMatrix; // Compose the two homographies
     // Use the Homography Matrix to warp the images
     cv::warpPerspective(central, result, H, result.size(), cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
     cv::imshow("2", result);
@@ -318,7 +318,7 @@ void mu::composePanorama(const std::vector<cv::Mat> &images) {
 
         // Find the Homography Matrix
         cv::Mat H1 = cv::findHomography(points1, points2, CV_RANSAC, 1);
-        H = H1 * cameraMatrix * H; // Compose the two homographies
+        H = H * H1; // Compose the two homographies
         // Use the Homography Matrix to warp the images
         cv::warpPerspective(img1, result, H, result.size(), cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
 
