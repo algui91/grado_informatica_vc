@@ -20,7 +20,7 @@ cv::Mat mu::estimatePMatrix() {
     do {
         cv::randu(P, 0, 1);
         M = P(cv::Rect(0, 0, 3, 3));
-    } while (cv::determinant(M) > 0);
+    } while (cv::determinant(M) < 0.2f);
 
     return P;
 }
