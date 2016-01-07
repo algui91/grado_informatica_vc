@@ -81,6 +81,16 @@ namespace mu {
      */
     const std::vector<cv::DMatch> goodMatches(const std::vector<cv::DMatch> &matches,
             int size);
+
+    void drawEpipolarLines(std::vector<cv::Mat>& images, const std::vector<std::vector<cv::Point2f> >& points, const cv::Mat& F);
+
+    /**
+     * Shows a list of images
+     * @param m list of images to show. If they are of different types, all are 
+     * converted to color (CV_8UC3)
+     */
+    void pintaMI(const std::vector<cv::Mat> &m);
+
 }
 #endif	/* UTILS_H */
 

@@ -132,3 +132,87 @@ const std::vector<cv::DMatch> mu::goodMatches(const std::vector<cv::DMatch> &mat
 
     return bestMatches;
 }
+
+void mu::drawEpipolarLines(std::vector<cv::Mat>& images, const std::vector<std::vector<cv::Point2f> >& points, const cv::Mat& F) {
+
+    std::vector<cv::Vec3f> lines1, lines2;
+    cv::computeCorrespondEpilines(points.at(0),
+            0,
+            F,
+            lines1);
+    cv::computeCorrespondEpilines(points.at(1),
+            1,
+            F,
+            lines2);
+    int i = 0;
+    LOG_MESSAGE(lines1.size());
+    LOG_MESSAGE(lines2.size());
+    cv::Point p1, p2, p11, p22;
+
+    
+    cv::cvtColor(images.at(0), images.at(0), CV_GRAY2RGB);
+    cv::cvtColor(images.at(1), images.at(1), CV_GRAY2RGB);
+    
+    std::vector<cv::Vec3f>::const_iterator it1 = lines1.begin();
+    std::vector<cv::Vec3f>::const_iterator it2 = lines2.begin();
+    
+    for (; it2 != lines2.end() && it1 != lines1.end() && i < 200; ++it1, ++it2) {
+        cv::Vec3f item1 = (*it1);
+        cv::Vec3f item2 = (*it2);
+        p1 = cv::Point(0, -item1.val[2] / item1.val[1]);
+        p2 = cv::Point(images.at(0).cols,
+                -(item1.val[2] + item1.val[0] * images.at(0).cols) / item1.val[1]);
+
+        p11 = cv::Point(0, -item2.val[2] / item2.val[1]);
+        p22 = cv::Point(images.at(1).cols,
+                -(item2.val[2] + item2.val[0] * images.at(1).cols) / item2.val[1]);
+
+        cv::RNG& rng = cv::theRNG();
+        cv::Scalar color = cv::Scalar(rng(256), rng(256), rng(256));
+
+        cv::line(images.at(0), p1, p2, color);
+        cv::line(images.at(1), p11, p22, color);
+        //            lines.at<Point>(0, lines_c) = p1;
+        //            lines.at<Point>(1, lines_c) = p2;
+        i++;
+    }
+
+    pintaMI(images);
+}
+
+void mu::pintaMI(const std::vector<cv::Mat> &m) {
+    if (!m.empty()) {
+        int height = 0;
+        int width = 0;
+
+        // Get the size of the resulting window in which to draw the images
+        // The window will be the sum of all width and the height of the greatest image
+        for (std::vector<cv::Mat>::const_iterator it = m.begin(); it != m.end(); ++it) {
+            cv::Mat item = (*it);
+            width += item.cols;
+            if (item.rows > height) {
+                height = item.rows;
+            }
+        }
+
+        // Create a Mat to store all the images
+        cv::Mat result(height, width, CV_8UC3);
+
+        int x = 0;
+        for (std::vector<cv::Mat>::const_iterator it = m.begin(); it != m.end(); ++it) {
+            cv::Mat item = (*it);
+            // If a image is in grayscale or black and white, convert it to 3 channels 8 bit depth
+            if (item.type() != CV_8UC3) {
+                cv::cvtColor(item, item, CV_GRAY2RGB);
+            }
+            cv::Mat roi(result, cv::Rect(x, 0, item.cols, item.rows));
+            item.copyTo(roi);
+            x += item.cols;
+        }
+
+        cv::namedWindow("Epipolar Lines", cv::WINDOW_AUTOSIZE);
+        cv::imshow("Epipolar Lines", result);
+        cv::waitKey(0);
+        cv::destroyWindow("Epipolar Lines");
+    }
+}

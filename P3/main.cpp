@@ -9,6 +9,7 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/calib3d.hpp>
 
 #include "Utils.h"
 #include "../P2/Utils.h"
@@ -48,14 +49,22 @@ int main() {
     // Excercise 2 - Camera calibration using homographies
 
 
-    // Excersise 3
-    // 3.a estimate points
+    /***************
+     * Excersise 3**
+     ***************
+     **/
+
+    /************************
+     *  3.a estimate points *
+     ************************
+     **/
+
     std::vector<cv::KeyPoint> keypoints1, keypoints2;
     cv::Mat descriptors1, descriptors2;
     cv::Mat img1, img2;
     img1 = cv::imread("./imagenes/Vmort1.pgm", cv::IMREAD_GRAYSCALE);
     img2 = cv::imread("./imagenes/Vmort2.pgm", cv::IMREAD_GRAYSCALE);
-    
+
     mu::runDetector(img1,
             img2,
             "ORB",
@@ -71,7 +80,31 @@ int main() {
             keypoints1,
             keypoints2);
 
-    
+    /**
+     * ***********************************************
+     *  3.b FindFundamentalMat using 8 points RANSAC *
+     * ***********************************************
+     **/
+    std::vector<cv::Point2f> points1, points2;
+    for (i = 0; i < matchPoints.size(); i++) {
+        points1.push_back(keypoints1.at(matchPoints.at(i).queryIdx).pt);
+        points2.push_back(keypoints2.at(matchPoints.at(i).trainIdx).pt);
+    }
+
+    // Leave defaults params for ransac, 3 and .99
+    cv::Mat F = cv::findFundamentalMat(points1, points2, CV_FM_8POINT + CV_FM_RANSAC);
+
+    /***************************
+     * 3.c Draw epipolar lines *
+     ***************************
+     **/
+    std::vector<cv::Mat> images;
+    std::vector<std::vector<cv::Point2f> > ePoints;
+    images.push_back(img1);
+    images.push_back(img2);
+    ePoints.push_back(points1);
+    ePoints.push_back(points2);
+    mu::drawEpipolarLines(images, ePoints, F);
 
     return 0;
 }
