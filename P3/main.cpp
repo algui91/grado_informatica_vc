@@ -100,11 +100,30 @@ int main() {
      **/
     std::vector<cv::Mat> images;
     std::vector<std::vector<cv::Point2f> > ePoints;
+    
     images.push_back(img1);
     images.push_back(img2);
     ePoints.push_back(points1);
     ePoints.push_back(points2);
-    mu::drawEpipolarLines(images, ePoints, F);
+    
+    std::vector<cv::Mat> lines = mu::drawEpipolarLines(images, ePoints, F);
+
+    /****************
+     * 3.d Verify F *
+     ****************
+     */
+    double error = mu::checkF(lines, ePoints);
+
+    std::cout << "Error in F: " << error << std::endl;
+    
+    /***********************************
+     * 4 - Compute the camera movement**
+     ***********************************
+     **/
+    /**
+     * 4.a: Read data from files
+     */
+    //    cv::readData
 
     return 0;
 }

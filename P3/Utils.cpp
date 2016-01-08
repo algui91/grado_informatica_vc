@@ -133,7 +133,7 @@ const std::vector<cv::DMatch> mu::goodMatches(const std::vector<cv::DMatch> &mat
     return bestMatches;
 }
 
-void mu::drawEpipolarLines(std::vector<cv::Mat>& images, const std::vector<std::vector<cv::Point2f> >& points, const cv::Mat& F) {
+std::vector<cv::Mat> mu::drawEpipolarLines(std::vector<cv::Mat>& images, const std::vector<std::vector<cv::Point2f> >& points, const cv::Mat& F) {
 
     std::vector<cv::Vec3f> lines1, lines2;
     cv::computeCorrespondEpilines(points.at(0),
@@ -149,13 +149,19 @@ void mu::drawEpipolarLines(std::vector<cv::Mat>& images, const std::vector<std::
     LOG_MESSAGE(lines2.size());
     cv::Point p1, p2, p11, p22;
 
-    
+    cv::Mat epipoLine1 = cv::Mat(2, lines1.size(), CV_64FC1);
+    cv::Mat epipoLine2 = cv::Mat(2, lines2.size(), CV_64FC1);
+
+    std::vector<cv::Mat> epipolarLines;
+    epipolarLines.push_back(epipoLine1);
+    epipolarLines.push_back(epipoLine2);
+
     cv::cvtColor(images.at(0), images.at(0), CV_GRAY2RGB);
     cv::cvtColor(images.at(1), images.at(1), CV_GRAY2RGB);
-    
+
     std::vector<cv::Vec3f>::const_iterator it1 = lines1.begin();
     std::vector<cv::Vec3f>::const_iterator it2 = lines2.begin();
-    
+
     for (; it2 != lines2.end() && it1 != lines1.end() && i < 200; ++it1, ++it2) {
         cv::Vec3f item1 = (*it1);
         cv::Vec3f item2 = (*it2);
@@ -172,12 +178,17 @@ void mu::drawEpipolarLines(std::vector<cv::Mat>& images, const std::vector<std::
 
         cv::line(images.at(0), p1, p2, color);
         cv::line(images.at(1), p11, p22, color);
-        //            lines.at<Point>(0, lines_c) = p1;
-        //            lines.at<Point>(1, lines_c) = p2;
+        epipoLine1.at<cv::Point>(0, i) = p1;
+        epipoLine1.at<cv::Point>(1, i) = p2;
+        epipoLine2.at<cv::Point>(0, i) = p11;
+        epipoLine2.at<cv::Point>(1, i) = p22;
+
         i++;
     }
 
     pintaMI(images);
+
+    return epipolarLines;
 }
 
 void mu::pintaMI(const std::vector<cv::Mat> &m) {
@@ -215,4 +226,29 @@ void mu::pintaMI(const std::vector<cv::Mat> &m) {
         cv::waitKey(0);
         cv::destroyWindow("Epipolar Lines");
     }
+}
+
+double mu::checkF(const std::vector<cv::Mat> &lines, const std::vector<std::vector<cv::Point2f> >& points) {
+
+    double err1 = 0.0;
+    double err2 = 0.0;
+    
+    for (int i = 0; i < lines.at(0).rows; i++) {
+        err1 += distance(lines.at(0).at<cv::Point>(0, i),
+                lines.at(0).at<cv::Point>(1, i), points.at(0).at(i));
+        err2 += distance(lines.at(1).at<cv::Point>(0, i),
+                lines.at(1).at<cv::Point>(1, i), points.at(1).at(i));
+    }
+    err1 /= lines.at(0).rows;
+    err2 /= lines.at(1).rows;
+
+    return (err1 + err2) / 2;
+}
+
+double mu::distance(cv::Point p1, cv::Point p2, cv::Point x) {
+    p2 -= p1;
+    x -= p1;
+    double A = x.cross(p2);
+    
+    return A / cv::norm(p2);
 }
