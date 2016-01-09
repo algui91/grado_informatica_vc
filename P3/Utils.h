@@ -83,11 +83,18 @@ namespace mu {
             int size);
 
     std::vector<cv::Mat> drawEpipolarLines(cv::Mat &img1, cv::Mat &img2,
-        const cv::Mat &lines, const std::vector<cv::Point2f> &p1, std::vector<cv::Point2f> &p2);
+            const cv::Mat &lines, const std::vector<cv::Point2f> &p1, std::vector<cv::Point2f> &p2,
+            cv::Mat &epipoleLine);
 
-    double checkF(const std::vector<cv::Mat> &lines, const std::vector<std::vector<cv::Point2f> >& points);
-    
+    double checkF(const cv::Mat &line1, const cv::Mat &line2,
+            const std::vector<cv::Point2f> &p1, const std::vector<cv::Point2f> &p2);
+
     double distance(cv::Point p1, cv::Point p2, cv::Point x);
+
+    bool loadFile(const std::string file, cv::Mat &K, cv::Mat &radial, cv::Mat &R,
+            cv::Mat &t);
+
+    void string2double(std::string string, std::vector<double> &numbers);
     
     /**
      * Shows a list of images

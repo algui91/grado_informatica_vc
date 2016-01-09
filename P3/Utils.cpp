@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -87,11 +88,12 @@ std::vector<cv::DMatch> mu::matching(const cv::Mat &img1, const cv::Mat &img2, c
         myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, goodMatches);
     } else if (descriptorMatcherType == "FlannBased") {
         // Match between img1 and img2
-        std::vector <cv::DMatch> matches;
-        cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(10, 10, 2));
-        matcher.match(descriptor1, descriptor2, matches);
-        goodMatches = mu::goodMatches(matches, 50);
-        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, goodMatches);
+        std::vector<std::vector<cv::DMatch> > matches;
+        cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(10, 10, 2), new cv::flann::SearchParams(50));
+        matcher.knnMatch(descriptor1, descriptor2, matches, 2);
+        //        matcher.match(descriptor1, descriptor2, matches);
+        //        goodMatches = mu::goodMatches(matches, 50);
+        //        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, goodMatches);
     }
 
     return goodMatches;
@@ -134,7 +136,8 @@ const std::vector<cv::DMatch> mu::goodMatches(const std::vector<cv::DMatch> &mat
 }
 
 std::vector<cv::Mat> mu::drawEpipolarLines(cv::Mat &img1, cv::Mat &img2,
-        const cv::Mat &lines, const std::vector<cv::Point2f> &p1, std::vector<cv::Point2f> &p2) {
+        const cv::Mat &lines, const std::vector<cv::Point2f> &p1, std::vector<cv::Point2f> &p2,
+        cv::Mat &epipoleLine) {
 
     if (img1.type() != CV_8UC3) {
         cv::cvtColor(img1, img1, CV_GRAY2RGB);
@@ -145,7 +148,7 @@ std::vector<cv::Mat> mu::drawEpipolarLines(cv::Mat &img1, cv::Mat &img2,
     std::vector<cv::Point2f>::const_iterator it1 = p1.begin();
     std::vector<cv::Point2f>::const_iterator it2 = p2.begin();
 
-    for (int i = 0; it2 != p2.end() && it1 != p1.end() && i < 200 && i < lines.rows; ++it1, ++it2, i++) {
+    for (int i = 0; it2 != p2.end() && it1 != p1.end() && i < 20 && i < lines.rows; ++it1, ++it2, i++) {
         //        cv::Point2f item1 = (*it1);
         //        cv::Point2f item2 = (*it2);
 
@@ -157,6 +160,9 @@ std::vector<cv::Mat> mu::drawEpipolarLines(cv::Mat &img1, cv::Mat &img2,
         cv::Scalar color = cv::Scalar(rng(256), rng(256), rng(256));
 
         cv::line(img1, x, y, color);
+
+        epipoleLine.at<cv::Point>(0, i) = x;
+        epipoleLine.at<cv::Point>(1, i) = y;
     }
 
     std::vector<cv::Mat> images;
@@ -203,21 +209,24 @@ void mu::pintaMI(const std::vector<cv::Mat> &m) {
     }
 }
 
-double mu::checkF(const std::vector<cv::Mat> &lines, const std::vector<std::vector<cv::Point2f> >& points) {
+double mu::checkF(const cv::Mat &lines1, const cv::Mat &lines2,
+        const std::vector<cv::Point2f> &p1, const std::vector<cv::Point2f> &p2) {
 
-    double err1 = 0.0;
-    double err2 = 0.0;
-
-    for (int i = 0; i < lines.at(0).rows; i++) {
-        err1 += distance(lines.at(0).at<cv::Point>(0, i),
-                lines.at(0).at<cv::Point>(1, i), points.at(0).at(i));
-        err2 += distance(lines.at(1).at<cv::Point>(0, i),
-                lines.at(1).at<cv::Point>(1, i), points.at(1).at(i));
+    double error1 = 0.0;
+    for (int i = 0; i < lines1.rows; i++) {
+        error1 += distance(lines1.at<cv::Point>(0, i),
+                lines1.at<cv::Point>(1, i), p1[i]);
     }
-    err1 /= lines.at(0).rows;
-    err2 /= lines.at(1).rows;
+    error1 /= lines1.rows;
 
-    return (err1 + err2) / 2;
+    double error2 = 0.0;
+    for (int i = 0; i < lines2.rows; i++) {
+        error2 += distance(lines2.at<cv::Point>(0, i),
+                lines2.at<cv::Point>(1, i), p2[i]);
+    }
+    error2 /= lines2.rows;
+
+    return (error1 + error2) / 2;
 }
 
 double mu::distance(cv::Point p1, cv::Point p2, cv::Point x) {
@@ -226,4 +235,75 @@ double mu::distance(cv::Point p1, cv::Point p2, cv::Point x) {
     double A = x.cross(p2);
 
     return A / cv::norm(p2);
+}
+
+void mu::string2double(std::string string, std::vector<double> &numbers) {
+    std::stringstream stream(string);
+
+    numbers.clear();
+    
+    while (stream) {
+        double n;
+        stream >> n;
+        numbers.push_back(n);
+    }
+    
+}
+
+bool mu::loadFile(const std::string file_name, cv::Mat &K, cv::Mat &radial, cv::Mat &R,
+        cv::Mat &t) {
+
+    std::string current_line;
+    std::vector<double> numbers;
+    std::ifstream f(file_name);
+
+    if (f.is_open()) {
+        // (3x3) camera matrix K
+        K = cv::Mat(3, 3, CV_64F);
+
+        for (int k = 0; k < 3; k++) {
+            getline(f, current_line);
+            string2double(current_line, numbers);
+            
+            K.at<double>(k, 0) = numbers[0];
+            K.at<double>(k, 1) = numbers[1];
+            K.at<double>(k, 2) = numbers[2];
+        }
+
+        // (3) radial distortion parameters
+        radial = cv::Mat(1, 3, CV_64F);
+        getline(f, current_line);
+        string2double(current_line, numbers);
+        
+        radial.at<double>(0, 0) = numbers[0];
+        radial.at<double>(0, 1) = numbers[1];
+        radial.at<double>(0, 2) = numbers[2];
+
+        // (3x3) rotation matrix R
+        R = cv::Mat(3, 3, CV_64F);
+        
+        for (int k = 0; k < 3; k++) {
+            getline(f, current_line);
+            string2double(current_line, numbers);
+            
+            R.at<double>(k, 0) = numbers[0];
+            R.at<double>(k, 1) = numbers[1];
+            R.at<double>(k, 2) = numbers[2];
+        }
+
+        // (3) translation vector t
+        t = cv::Mat(1, 3, CV_64F);
+        getline(f, current_line);
+        string2double(current_line, numbers);
+        
+        t.at<double>(0, 0) = numbers[0];
+        t.at<double>(0, 1) = numbers[1];
+        t.at<double>(0, 2) = numbers[2];
+
+        f.close();
+        
+        return true;
+    }
+
+    return false;
 }

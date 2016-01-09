@@ -72,23 +72,34 @@ int main() {
             descriptors2,
             keypoints1,
             keypoints2);
-    std::vector<cv::DMatch> matchPoints = mu::matching(img1,
-            img2,
-            "FlannBased",
-            descriptors1,
-            descriptors2,
-            keypoints1,
-            keypoints2);
+    //    std::vector<cv::DMatch> matchPoints = mu::matching(img1,
+    //            img2,
+    //            "FlannBased",
+    //            descriptors1,
+    //            descriptors2,
+    //            keypoints1,
+    //            keypoints2);
+    std::vector<std::vector<cv::DMatch> > matches;
+    cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(10, 10, 2), new cv::flann::SearchParams(50));
+    matcher.knnMatch(descriptors1, descriptors2, matches, 2);
 
     /**
      * ***********************************************
      *  3.b FindFundamentalMat using 8 points RANSAC *
      * ***********************************************
      **/
+
+    std::vector<cv::DMatch> goodMatchs;
     std::vector<cv::Point2f> points1, points2;
-    for (i = 0; i < matchPoints.size(); i++) {
-        points1.push_back(keypoints1.at(matchPoints.at(i).queryIdx).pt);
-        points2.push_back(keypoints2.at(matchPoints.at(i).trainIdx).pt);
+    for (i = 0; i < matches.size(); i++) {
+        cv::DMatch m, n;
+        m = matches.at(i).at(0);
+        n = matches.at(i).at(1);
+        if (m.distance < 0.8 * n.distance) {
+            goodMatchs.push_back(m);
+            points2.push_back(keypoints2.at(m.trainIdx).pt);
+            points1.push_back(keypoints1.at(m.queryIdx).pt);
+        }
     }
 
     // Leave defaults params for ransac, 3 and .99
@@ -101,27 +112,26 @@ int main() {
      **/
     cv::Mat lines1, lines2;
     cv::computeCorrespondEpilines(points2, 2, F, lines1);
-    lines1.reshape(-1,3);
-    std::vector<cv::Mat> imgs56 = mu::drawEpipolarLines(img1, img2, lines1, points1, points2);
-    
+    cv::Mat epipoLine1 = cv::Mat(2, lines1.size, CV_64FC1);
+    std::vector<cv::Mat> imgs56 = mu::drawEpipolarLines(img1, img2, lines1, points1, points2, epipoLine1);
+
     cv::computeCorrespondEpilines(points1, 1, F, lines2);
-    lines2.reshape(-1,3);
-    std::vector<cv::Mat> imgs34 = mu::drawEpipolarLines(img2, img1, lines2, points2, points1);
-    
+    cv::Mat epipoLine2 = cv::Mat(2, lines2.size, CV_64FC1);
+    std::vector<cv::Mat> imgs34 = mu::drawEpipolarLines(img2, img1, lines2, points2, points1, epipoLine2);
+
     std::vector<cv::Mat> img53;
     img53.push_back(imgs56.at(0));
     img53.push_back(imgs34.at(0));
-    
+
     mu::pintaMI(img53);
 
     /****************
      * 3.d Verify F *
      ****************
      */
-//    double error = mu::checkF(lines, ePoints);
-//
-//    std::cout << "Error in F: " << error << std::endl;
-    
+    //    double error = mu::checkF(epipoLine1, epipoLine2, points1, points2);
+    //    std::cout << "Error in F: " << error << std::endl;
+
     /***********************************
      * 4 - Compute the camera movement**
      ***********************************
@@ -129,7 +139,14 @@ int main() {
     /**
      * 4.a: Read data from files
      */
-    //    cv::readData
+    std::vector<cv::Mat> K(3), radial(3), R(3), t(3);
+    
+    mu::loadFile("imagenes/rdimage.000.ppm.camera", K[0], radial[0],
+            R[0], t[0]);
+    mu::loadFile("imagenes/rdimage.001.ppm.camera", K[1], radial[1],
+            R[1], t[1]);
+    mu::loadFile("imagenes/rdimage.004.ppm.camera", K[2], radial[2],
+            R[2], t[2]);
 
     return 0;
 }
