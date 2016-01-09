@@ -133,62 +133,37 @@ const std::vector<cv::DMatch> mu::goodMatches(const std::vector<cv::DMatch> &mat
     return bestMatches;
 }
 
-std::vector<cv::Mat> mu::drawEpipolarLines(std::vector<cv::Mat>& images, const std::vector<std::vector<cv::Point2f> >& points, const cv::Mat& F) {
+std::vector<cv::Mat> mu::drawEpipolarLines(cv::Mat &img1, cv::Mat &img2,
+        const cv::Mat &lines, const std::vector<cv::Point2f> &p1, std::vector<cv::Point2f> &p2) {
 
-    std::vector<cv::Vec3f> lines1, lines2;
-    cv::computeCorrespondEpilines(points.at(0),
-            0,
-            F,
-            lines1);
-    cv::computeCorrespondEpilines(points.at(1),
-            1,
-            F,
-            lines2);
-    int i = 0;
-    LOG_MESSAGE(lines1.size());
-    LOG_MESSAGE(lines2.size());
-    cv::Point p1, p2, p11, p22;
+    if (img1.type() != CV_8UC3) {
+        cv::cvtColor(img1, img1, CV_GRAY2RGB);
+    }
+    if (img2.type() != CV_8UC3) {
+        cv::cvtColor(img2, img2, CV_GRAY2RGB);
+    }
+    std::vector<cv::Point2f>::const_iterator it1 = p1.begin();
+    std::vector<cv::Point2f>::const_iterator it2 = p2.begin();
 
-    cv::Mat epipoLine1 = cv::Mat(2, lines1.size(), CV_64FC1);
-    cv::Mat epipoLine2 = cv::Mat(2, lines2.size(), CV_64FC1);
+    for (int i = 0; it2 != p2.end() && it1 != p1.end() && i < 200 && i < lines.rows; ++it1, ++it2, i++) {
+        //        cv::Point2f item1 = (*it1);
+        //        cv::Point2f item2 = (*it2);
 
-    std::vector<cv::Mat> epipolarLines;
-    epipolarLines.push_back(epipoLine1);
-    epipolarLines.push_back(epipoLine2);
-
-    cv::cvtColor(images.at(0), images.at(0), CV_GRAY2RGB);
-    cv::cvtColor(images.at(1), images.at(1), CV_GRAY2RGB);
-
-    std::vector<cv::Vec3f>::const_iterator it1 = lines1.begin();
-    std::vector<cv::Vec3f>::const_iterator it2 = lines2.begin();
-
-    for (; it2 != lines2.end() && it1 != lines1.end() && i < 200; ++it1, ++it2) {
-        cv::Vec3f item1 = (*it1);
-        cv::Vec3f item2 = (*it2);
-        p1 = cv::Point(0, -item1.val[2] / item1.val[1]);
-        p2 = cv::Point(images.at(0).cols,
-                -(item1.val[2] + item1.val[0] * images.at(0).cols) / item1.val[1]);
-
-        p11 = cv::Point(0, -item2.val[2] / item2.val[1]);
-        p22 = cv::Point(images.at(1).cols,
-                -(item2.val[2] + item2.val[0] * images.at(1).cols) / item2.val[1]);
+        cv::Point x = cv::Point(0, -lines.at<cv::Vec3f>(i).val[2] / lines.at<cv::Vec3f>(i).val[1]);
+        cv::Point y = cv::Point(img1.cols, -(lines.at<cv::Vec3f>(i).val[2] + lines.at<cv::Vec3f>(i).val[0] * img1.cols)
+                / lines.at<cv::Vec3f>(i).val[1]);
 
         cv::RNG& rng = cv::theRNG();
         cv::Scalar color = cv::Scalar(rng(256), rng(256), rng(256));
 
-        cv::line(images.at(0), p1, p2, color);
-        cv::line(images.at(1), p11, p22, color);
-        epipoLine1.at<cv::Point>(0, i) = p1;
-        epipoLine1.at<cv::Point>(1, i) = p2;
-        epipoLine2.at<cv::Point>(0, i) = p11;
-        epipoLine2.at<cv::Point>(1, i) = p22;
-
-        i++;
+        cv::line(img1, x, y, color);
     }
 
-    pintaMI(images);
+    std::vector<cv::Mat> images;
+    images.push_back(img1);
+    images.push_back(img2);
 
-    return epipolarLines;
+    return images;
 }
 
 void mu::pintaMI(const std::vector<cv::Mat> &m) {
@@ -232,7 +207,7 @@ double mu::checkF(const std::vector<cv::Mat> &lines, const std::vector<std::vect
 
     double err1 = 0.0;
     double err2 = 0.0;
-    
+
     for (int i = 0; i < lines.at(0).rows; i++) {
         err1 += distance(lines.at(0).at<cv::Point>(0, i),
                 lines.at(0).at<cv::Point>(1, i), points.at(0).at(i));
@@ -249,6 +224,6 @@ double mu::distance(cv::Point p1, cv::Point p2, cv::Point x) {
     p2 -= p1;
     x -= p1;
     double A = x.cross(p2);
-    
+
     return A / cv::norm(p2);
 }

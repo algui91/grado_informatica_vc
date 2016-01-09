@@ -92,29 +92,35 @@ int main() {
     }
 
     // Leave defaults params for ransac, 3 and .99
-    cv::Mat F = cv::findFundamentalMat(points1, points2, CV_FM_8POINT + CV_FM_RANSAC);
+    cv::Mat mask;
+    cv::Mat F = cv::findFundamentalMat(points1, points2, mask, CV_FM_8POINT + CV_FM_RANSAC);
 
     /***************************
      * 3.c Draw epipolar lines *
      ***************************
      **/
-    std::vector<cv::Mat> images;
-    std::vector<std::vector<cv::Point2f> > ePoints;
+    cv::Mat lines1, lines2;
+    cv::computeCorrespondEpilines(points2, 2, F, lines1);
+    lines1.reshape(-1,3);
+    std::vector<cv::Mat> imgs56 = mu::drawEpipolarLines(img1, img2, lines1, points1, points2);
     
-    images.push_back(img1);
-    images.push_back(img2);
-    ePoints.push_back(points1);
-    ePoints.push_back(points2);
+    cv::computeCorrespondEpilines(points1, 1, F, lines2);
+    lines2.reshape(-1,3);
+    std::vector<cv::Mat> imgs34 = mu::drawEpipolarLines(img2, img1, lines2, points2, points1);
     
-    std::vector<cv::Mat> lines = mu::drawEpipolarLines(images, ePoints, F);
+    std::vector<cv::Mat> img53;
+    img53.push_back(imgs56.at(0));
+    img53.push_back(imgs34.at(0));
+    
+    mu::pintaMI(img53);
 
     /****************
      * 3.d Verify F *
      ****************
      */
-    double error = mu::checkF(lines, ePoints);
-
-    std::cout << "Error in F: " << error << std::endl;
+//    double error = mu::checkF(lines, ePoints);
+//
+//    std::cout << "Error in F: " << error << std::endl;
     
     /***********************************
      * 4 - Compute the camera movement**

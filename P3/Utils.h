@@ -82,7 +82,8 @@ namespace mu {
     const std::vector<cv::DMatch> goodMatches(const std::vector<cv::DMatch> &matches,
             int size);
 
-    std::vector<cv::Mat> drawEpipolarLines(std::vector<cv::Mat>& images, const std::vector<std::vector<cv::Point2f> >& points, const cv::Mat& F);
+    std::vector<cv::Mat> drawEpipolarLines(cv::Mat &img1, cv::Mat &img2,
+        const cv::Mat &lines, const std::vector<cv::Point2f> &p1, std::vector<cv::Point2f> &p2);
 
     double checkF(const std::vector<cv::Mat> &lines, const std::vector<std::vector<cv::Point2f> >& points);
     
