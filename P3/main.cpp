@@ -26,26 +26,28 @@ int main() {
 
     uint i;
 
-    // Exercise 1
-    // a - Estimate a finite camera matrix P from a set of random points in [0,1]
+    /***************
+     * Excersise 1**
+     ***************
+     **/
+
+    /********************************************************************************
+     * 1.a - Estimate a finite camera matrix P from a set of random points in [0,1] *
+     ********************************************************************************/
     cv::Mat P = mu::estimatePMatrix();
-    // b - Let be a 3D set of points (0,x1,x2) y (x2,x1,0), for x1=0.1:0.1:1 and x2=0.1:0.1:1
+    /******************************************************************************************
+     * 1.b Let be a 3D set of points (0,x1,x2) y (x2,x1,0), for x1=0.1:0.1:1 and x2=0.1:0.1:1 *
+     ******************************************************************************************/
     std::vector<double> x1;
     std::vector<double> x2;
     std::vector<cv::Point3f> points;
 
-    x1.push_back(0.1);
-    x1.push_back(0.1);
-    x1.push_back(1);
-    x2.push_back(0.1);
-    x2.push_back(0.1);
-    x2.push_back(1);
-
-    for (i = 0; i < x1.size(); i++) {
-        points.push_back(cv::Point3f(0, x1.at(i), x2.at(i)));
-        points.push_back(cv::Point3f(x2.at(i), x1.at(i), 0));
+    for (double k = .1; k <= 1; k += .1) {
+        for (double k2 = .1; k2 <= 1; k2 += .1) {
+            points.push_back(cv::Point3f(0, k, k2));
+            points.push_back(cv::Point3f(k2, k, 0));
+        }
     }
-
     // Excercise 2 - Camera calibration using homographies
 
 
@@ -172,15 +174,19 @@ int main() {
 
     points1.clear();
     points2.clear();
-            
+
     for (i = 0; i < matchPoints.size() && i < 1000; i++) {
         points1.push_back(keypoints1[matchPoints.at(i).queryIdx].pt);
         points2.push_back(keypoints2[matchPoints.at(i).trainIdx].pt);
     }
-    
+
     /**
      * 4.c: Compute E and motion
      */
+    // First we need to compute F
+    F = cv::findFundamentalMat(points1, points2, CV_FM_8POINT + CV_FM_RANSAC);
+    // Now we proceed to compute E
+    //    cv::Mat E = K1.t() * F * K0;
 
     return 0;
 }
