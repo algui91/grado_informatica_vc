@@ -36,21 +36,27 @@ int main() {
      ********************************************************************************/
     cv::Mat P = mu::estimatePMatrix();
     /******************************************************************************************
-     * 1.b Let be a 3D set of points (0,x1,x2) y (x2,x1,0), for x1=0.1:0.1:1 and x2=0.1:0.1:1 *
+     * 1.b - Let be a 3D set of points (0,x1,x2) y (x2,x1,0), for x1=0.1:0.1:1 and x2=0.1:0.1:1 *
      ******************************************************************************************/
-    std::vector<double> x1;
-    std::vector<double> x2;
-    std::vector<cv::Point3f> points;
+    std::vector<cv::Mat> points;
 
     for (double k = .1; k <= 1; k += .1) {
         for (double k2 = .1; k2 <= 1; k2 += .1) {
-            points.push_back(cv::Point3f(0, k, k2));
-            points.push_back(cv::Point3f(k2, k, 0));
+            points.push_back((cv::Mat_<double>(4,1) << 0, k, k2, 1));
+            points.push_back((cv::Mat_<double>(4,1) << k2, k, 0, 1));
         }
     }
+    
+    /*******************************************************************
+     * 1.c - Project the world points into pixels using the computed P *
+     *******************************************************************/
+    std::cout << "Projected points using P: " << std::endl;
+    for (i = 0; i < points.size(); i++) {
+        cv::Mat point = points.at(i);
+        std::cout << P * point << std::endl;
+    }
+
     // Excercise 2 - Camera calibration using homographies
-
-
     /***************
      * Excersise 3**
      ***************
