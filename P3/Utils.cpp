@@ -79,21 +79,21 @@ void mu::runDetector(const cv::Mat &img1, const cv::Mat &img2, const std::string
 std::vector<cv::DMatch> mu::matching(const cv::Mat &img1, const cv::Mat &img2, const std::string &descriptorMatcherType, cv::Mat &descriptor1, cv::Mat &descriptor2, std::vector<cv::KeyPoint> &kp1, std::vector<cv::KeyPoint> &kp2) {
 
     std::vector<cv::DMatch> goodMatches;
+    std::vector<cv::DMatch> matches;
 
     if (descriptorMatcherType == "BruteForce+Cross") {
         cv::BFMatcher matcher(cv::NORM_HAMMING, true);
-        std::vector<cv::DMatch> matches;
         matcher.match(descriptor1, descriptor2, matches);
         goodMatches = mu::goodMatches(matches, 50);
         myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, goodMatches);
     } else if (descriptorMatcherType == "FlannBased") {
         // Match between img1 and img2
-        std::vector<std::vector<cv::DMatch> > matches;
+        //        std::vector<std::vector<cv::DMatch> > matches;
         cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(10, 10, 2), new cv::flann::SearchParams(50));
-        matcher.knnMatch(descriptor1, descriptor2, matches, 2);
-        //        matcher.match(descriptor1, descriptor2, matches);
-        //        goodMatches = mu::goodMatches(matches, 50);
-        //        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, goodMatches);
+        //        matcher.knnMatch(descriptor1, descriptor2, matches, 2);
+        matcher.match(descriptor1, descriptor2, matches);
+        goodMatches = mu::goodMatches(matches, 50);
+        myDrawMatches(descriptorMatcherType, img1, kp1, img2, kp2, goodMatches);
     }
 
     return goodMatches;
@@ -241,16 +241,16 @@ void mu::string2double(std::string string, std::vector<double> &numbers) {
     std::stringstream stream(string);
 
     numbers.clear();
-    
+
     while (stream) {
         double n;
         stream >> n;
         numbers.push_back(n);
     }
-    
+
 }
 
-bool mu::loadFile(const std::string file_name, cv::Mat &K, cv::Mat &radial, cv::Mat &R,
+bool mu::loadFromFile(const std::string file_name, cv::Mat &K, cv::Mat &radial, cv::Mat &R,
         cv::Mat &t) {
 
     std::string current_line;
@@ -264,7 +264,7 @@ bool mu::loadFile(const std::string file_name, cv::Mat &K, cv::Mat &radial, cv::
         for (int k = 0; k < 3; k++) {
             getline(f, current_line);
             string2double(current_line, numbers);
-            
+
             K.at<double>(k, 0) = numbers[0];
             K.at<double>(k, 1) = numbers[1];
             K.at<double>(k, 2) = numbers[2];
@@ -274,18 +274,18 @@ bool mu::loadFile(const std::string file_name, cv::Mat &K, cv::Mat &radial, cv::
         radial = cv::Mat(1, 3, CV_64F);
         getline(f, current_line);
         string2double(current_line, numbers);
-        
+
         radial.at<double>(0, 0) = numbers[0];
         radial.at<double>(0, 1) = numbers[1];
         radial.at<double>(0, 2) = numbers[2];
 
         // (3x3) rotation matrix R
         R = cv::Mat(3, 3, CV_64F);
-        
+
         for (int k = 0; k < 3; k++) {
             getline(f, current_line);
             string2double(current_line, numbers);
-            
+
             R.at<double>(k, 0) = numbers[0];
             R.at<double>(k, 1) = numbers[1];
             R.at<double>(k, 2) = numbers[2];
@@ -295,13 +295,13 @@ bool mu::loadFile(const std::string file_name, cv::Mat &K, cv::Mat &radial, cv::
         t = cv::Mat(1, 3, CV_64F);
         getline(f, current_line);
         string2double(current_line, numbers);
-        
+
         t.at<double>(0, 0) = numbers[0];
         t.at<double>(0, 1) = numbers[1];
         t.at<double>(0, 2) = numbers[2];
 
         f.close();
-        
+
         return true;
     }
 

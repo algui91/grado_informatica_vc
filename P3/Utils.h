@@ -91,11 +91,11 @@ namespace mu {
 
     double distance(cv::Point p1, cv::Point p2, cv::Point x);
 
-    bool loadFile(const std::string file, cv::Mat &K, cv::Mat &radial, cv::Mat &R,
+    bool loadFromFile(const std::string file, cv::Mat &K, cv::Mat &radial, cv::Mat &R,
             cv::Mat &t);
 
     void string2double(std::string string, std::vector<double> &numbers);
-    
+
     /**
      * Shows a list of images
      * @param m list of images to show. If they are of different types, all are 

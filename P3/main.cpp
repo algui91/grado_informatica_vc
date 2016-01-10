@@ -136,17 +136,51 @@ int main() {
      * 4 - Compute the camera movement**
      ***********************************
      **/
+
     /**
      * 4.a: Read data from files
      */
     std::vector<cv::Mat> K(3), radial(3), R(3), t(3);
-    
-    mu::loadFile("imagenes/rdimage.000.ppm.camera", K[0], radial[0],
+
+    mu::loadFromFile("imagenes/rdimage.000.ppm.camera", K[0], radial[0],
             R[0], t[0]);
-    mu::loadFile("imagenes/rdimage.001.ppm.camera", K[1], radial[1],
+    mu::loadFromFile("imagenes/rdimage.001.ppm.camera", K[1], radial[1],
             R[1], t[1]);
-    mu::loadFile("imagenes/rdimage.004.ppm.camera", K[2], radial[2],
+    mu::loadFromFile("imagenes/rdimage.004.ppm.camera", K[2], radial[2],
             R[2], t[2]);
+    /**
+     * 4.b: Compute points in correspondence
+     */
+    cv::Mat img0 = cv::imread("./imagenes/rdimage.000.ppm", cv::IMREAD_GRAYSCALE);
+    img1 = cv::imread("./imagenes/rdimage.001.ppm", cv::IMREAD_GRAYSCALE);
+    img2 = cv::imread("./imagenes/rdimage.004.ppm", cv::IMREAD_GRAYSCALE);
+
+    mu::runDetector(img0,
+            img1,
+            "ORB",
+            descriptors1,
+            descriptors2,
+            keypoints1,
+            keypoints2);
+    std::vector<cv::DMatch> matchPoints = mu::matching(img0,
+            img1,
+            "FlannBased",
+            descriptors1,
+            descriptors2,
+            keypoints1,
+            keypoints2);
+
+    points1.clear();
+    points2.clear();
+            
+    for (i = 0; i < matchPoints.size() && i < 1000; i++) {
+        points1.push_back(keypoints1[matchPoints.at(i).queryIdx].pt);
+        points2.push_back(keypoints2[matchPoints.at(i).trainIdx].pt);
+    }
+    
+    /**
+     * 4.c: Compute E and motion
+     */
 
     return 0;
 }
