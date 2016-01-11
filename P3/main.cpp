@@ -37,6 +37,8 @@ int main() {
      ********************************************************************************/
     cv::Mat P = mu::estimatePMatrix();
     std::cout << "Matrix P " << P << std::endl;
+    std::cout << "Press enter to show next exercise result" << std::endl;
+    std::cin.get();
     /******************************************************************************************
      * 1.b - Let be a 3D set of points (0,x1,x2) y (x2,x1,0), for x1=0.1:0.1:1 and x2=0.1:0.1:1 *
      ******************************************************************************************/
@@ -52,20 +54,47 @@ int main() {
     /*******************************************************************
      * 1.c - Project the world points into pixels using the computed P *
      *******************************************************************/
-    std::vector<cv::Mat_<double>> points2D;
+    std::vector<cv::Matx31d> points2D;
     std::cout << "Projected points using P: " << std::endl;
     for (i = 0; i < points3D.size(); i++) {
-        points2D.push_back(P * points3D.at(i));
-        std::cout << P * points3D.at(i) << std::endl;
+        cv::Mat_<double> projected = P * points3D.at(i);
+        projected /= projected.at<double>(2);
+        points2D.push_back(projected);
+        std::cout << points2D.at(i) << std::endl;
     }
+    std::cout << "Press enter to show next exercise result" << std::endl;
+    std::cin.get();
 
     /**
      * 1.d - Estimate P matrix from 3d points and projections using DLT
      */
     cv::Mat P1 = mu::dlt(points3D, points2D);
-    LOG_MESSAGE("P calculada");
-    LOG_MESSAGE(P);
+
+    std::cout << "New matrix P computed from the set of points using DLT." << std::endl;
+    std::cout << P1 << std::endl;
+    std::cout << "Press enter to show next exercise result" << std::endl;
+    std::cin.get();
+
+    std::cout << "Projected points again but using new P: " << std::endl;
+    points2D.clear();
+    for (i = 0; i < points3D.size(); i++) {
+        cv::Mat_<double> projected = P1 * points3D.at(i);
+        projected /= projected.at<double>(2);
+        points2D.push_back(projected);
+        std::cout << projected << std::endl;
+    }
+    std::cout << "Press enter to show next exercise result" << std::endl;
+    std::cin.get();
+
+    /****************************************************
+     * 3.e - Compute error in estimation with frobenius *
+     ****************************************************/
+    
+    double err = cv::norm(P1, CV_L2);
+    LOG_MESSAGE(err);
+    
     return 0;
+    
     // Excercise 2 - Camera calibration using homographies
     /***************
      * Excersise 3**

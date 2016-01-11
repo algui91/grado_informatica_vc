@@ -308,7 +308,7 @@ bool mu::loadFromFile(const std::string file_name, cv::Mat &K, cv::Mat &radial, 
     return false;
 }
 
-cv::Mat mu::dlt(const std::vector<cv::Mat_<double> > &points3D, const std::vector<cv::Mat_<double> > &points2D) {
+cv::Mat mu::dlt(const std::vector<cv::Mat_<double> > &points3D, const std::vector<cv::Matx31d> &points2D) {
 
     cv::Mat A(2 * points3D.size(), 12, CV_64F);
 
@@ -317,22 +317,21 @@ cv::Mat mu::dlt(const std::vector<cv::Mat_<double> > &points3D, const std::vecto
     //Compute A
     for (uint i = 0; i < points3D.size(); ++i) {
         // TODO: Put matrix from theory
-
-        cv::Point3f p3D(points3D.at(i).at<double>(i,0), points3D.at(i).at<double>(i,1), points3D.at(i).at<double>(i,2));
-        cv::Point2f p2D(points2D.at(i).at<double>(i, 0), points2D.at(i).at<double>(i, 1));
+        cv::Matx41d p3D(points3D.at(i).at<double>(0), points3D.at(i).at<double>(1), points3D.at(i).at<double>(2), 1);
+        cv::Point2d p2D(points2D.at(i).val[0], points2D.at(i).val[1]);
 
         // first row
-        *p++ = p3D.x;
-        *p++ = p3D.y;
-        *p++ = p3D.z;
+        *p++ = p3D.val[0];
+        *p++ = p3D.val[1];
+        *p++ = p3D.val[2];
         *p++ = 1;
         *p++ = 0;
         *p++ = 0;
         *p++ = 0;
         *p++ = 0;
-        *p++ = -(p2D.x * p3D.x);
-        *p++ = -(p2D.x * p3D.y);
-        *p++ = -(p2D.x * p3D.z);
+        *p++ = -(p2D.x * p3D.val[0]);
+        *p++ = -(p2D.x * p3D.val[1]);
+        *p++ = -(p2D.x * p3D.val[2]);
         *p++ = -p2D.x;
 
         // second row
@@ -340,18 +339,18 @@ cv::Mat mu::dlt(const std::vector<cv::Mat_<double> > &points3D, const std::vecto
         *p++ = 0;
         *p++ = 0;
         *p++ = 0;
-        *p++ = p3D.x;
-        *p++ = p3D.y;
-        *p++ = p3D.z;
+        *p++ = p3D.val[0];
+        *p++ = p3D.val[1];
+        *p++ = p3D.val[2];
         *p++ = 1;
-        *p++ = -(p2D.y * p3D.x);
-        *p++ = -(p2D.y * p3D.y);
-        *p++ = -(p2D.y * p3D.z);
+        *p++ = -(p2D.y * p3D.val[0]);
+        *p++ = -(p2D.y * p3D.val[1]);
+        *p++ = -(p2D.y * p3D.val[2]);
         *p++ = -p2D.y;
     }
-
+    
     cv::SVD svd(A, cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
     cv::Mat Hn = svd.vt.row(11).reshape(0, 3); // H12
-
+    
     return Hn;
 }
