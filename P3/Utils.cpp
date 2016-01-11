@@ -354,3 +354,12 @@ cv::Mat mu::dlt(const std::vector<cv::Mat_<double> > &points3D, const std::vecto
     
     return Hn;
 }
+
+void mu::drawImage(cv::Mat &m, std::string windowName) {
+    if (!m.empty()) {
+        cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+        cv::imshow(windowName, m);
+        cv::waitKey(0);
+        cv::destroyWindow(windowName);
+    }
+}

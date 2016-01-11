@@ -103,6 +103,8 @@ namespace mu {
      * converted to color (CV_8UC3)
      */
     void pintaMI(const std::vector<cv::Mat> &m);
+    
+    void drawImage(cv::Mat &m, std::string windowName);
 
 }
 #endif	/* UTILS_H */

@@ -54,13 +54,13 @@ int main() {
     /*******************************************************************
      * 1.c - Project the world points into pixels using the computed P *
      *******************************************************************/
-    std::vector<cv::Matx31d> points2D;
+    std::vector<cv::Matx31d> points2DEstimated;
     std::cout << "Projected points using P: " << std::endl;
     for (i = 0; i < points3D.size(); i++) {
         cv::Mat_<double> projected = P * points3D.at(i);
         projected /= projected.at<double>(2);
-        points2D.push_back(projected);
-        std::cout << points2D.at(i) << std::endl;
+        points2DEstimated.push_back(projected);
+        std::cout << points2DEstimated.at(i) << std::endl;
     }
     std::cout << "Press enter to show next exercise result" << std::endl;
     std::cin.get();
@@ -68,7 +68,7 @@ int main() {
     /**
      * 1.d - Estimate P matrix from 3d points and projections using DLT
      */
-    cv::Mat P1 = mu::dlt(points3D, points2D);
+    cv::Mat P1 = mu::dlt(points3D, points2DEstimated);
 
     std::cout << "New matrix P computed from the set of points using DLT." << std::endl;
     std::cout << P1 << std::endl;
@@ -76,11 +76,11 @@ int main() {
     std::cin.get();
 
     std::cout << "Projected points again but using new P: " << std::endl;
-    points2D.clear();
+    std::vector<cv::Matx31d> points2DSimulated;
     for (i = 0; i < points3D.size(); i++) {
         cv::Mat_<double> projected = P1 * points3D.at(i);
         projected /= projected.at<double>(2);
-        points2D.push_back(projected);
+        points2DSimulated.push_back(projected);
         std::cout << projected << std::endl;
     }
     std::cout << "Press enter to show next exercise result" << std::endl;
@@ -89,9 +89,34 @@ int main() {
     /****************************************************
      * 3.e - Compute error in estimation with frobenius *
      ****************************************************/
-    
+    // TODO: implement
     double err = cv::norm(P1, CV_L2);
-    LOG_MESSAGE(err);
+    
+    std::cout << "Frobenius Error" << std::endl;
+    std::cout << err << std::endl;
+    std::cout << "Press enter to show next exercise result" << std::endl;
+    std::cin.get();
+    
+    /*******************************************************************
+     * 3.f - Show 3D points projected with P estimated and P simulated *
+     *******************************************************************/
+    cv::Mat image = cv::Mat(512, 512, CV_8UC3, cv::Scalar(0,0,0));
+    
+    for (i = 0; i < points2DEstimated.size(); i++) {
+        cv::Point pixelEstimated(points2DEstimated.at(i).val[0] * 100, points2DEstimated.at(i).val[1] * 100);
+        cv::Point pixelSimulated(points2DSimulated.at(i).val[0] * 100, points2DSimulated.at(i).val[1] * 100);
+        
+        LOG_MESSAGE(pixelEstimated);
+        LOG_MESSAGE(pixelSimulated);
+        
+        image.at<cv::Vec3b>(pixelEstimated) = cv::Vec3b(0,255,0);
+        image.at<cv::Vec3b>(pixelSimulated) = cv::Vec3b(0,0,255);
+    }
+
+    LOG_MESSAGE(P);
+    LOG_MESSAGE(P1);
+    
+    mu::drawImage(image, "k");
     
     return 0;
     
