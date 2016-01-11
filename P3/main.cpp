@@ -13,7 +13,6 @@
 #include <opencv2/highgui.hpp>
 
 #include "Utils.h"
-#include "../P2/Utils.h"
 
 #define _DEBUG 1
 
@@ -56,6 +55,8 @@ int main() {
      *******************************************************************/
     std::vector<cv::Matx31d> points2DEstimated;
     std::cout << "Projected points using P: " << std::endl;
+    std::cout << "Press enter to show results." << std::endl;
+    std::cin.get();
     for (i = 0; i < points3D.size(); i++) {
         cv::Mat_<double> projected = P * points3D.at(i);
         projected /= projected.at<double>(2);
@@ -76,6 +77,8 @@ int main() {
     std::cin.get();
 
     std::cout << "Projected points again but using new P: " << std::endl;
+    std::cout << "Press enter to show results." << std::endl;
+    std::cin.get();
     std::vector<cv::Matx31d> points2DSimulated;
     for (i = 0; i < points3D.size(); i++) {
         cv::Mat_<double> projected = P1 * points3D.at(i);
@@ -87,40 +90,35 @@ int main() {
     std::cin.get();
 
     /****************************************************
-     * 3.e - Compute error in estimation with frobenius *
+     * 1.e - Compute error in estimation with frobenius *
      ****************************************************/
-    // TODO: implement
     double err = cv::norm(P1, CV_L2);
-    
+
     std::cout << "Frobenius Error" << std::endl;
     std::cout << err << std::endl;
     std::cout << "Press enter to show next exercise result" << std::endl;
     std::cin.get();
-    
+
     /*******************************************************************
-     * 3.f - Show 3D points projected with P estimated and P simulated *
+     * 1.f - Show 3D points projected with P estimated and P simulated *
      *******************************************************************/
-    cv::Mat image = cv::Mat(512, 512, CV_8UC3, cv::Scalar(0,0,0));
-    
+    cv::Mat image = cv::Mat(512, 512, CV_8UC3, cv::Scalar(0, 0, 0));
+
     for (i = 0; i < points2DEstimated.size(); i++) {
         cv::Point pixelEstimated(points2DEstimated.at(i).val[0] * 100, points2DEstimated.at(i).val[1] * 100);
         cv::Point pixelSimulated(points2DSimulated.at(i).val[0] * 100, points2DSimulated.at(i).val[1] * 100);
-        
+
         LOG_MESSAGE(pixelEstimated);
         LOG_MESSAGE(pixelSimulated);
-        
-        image.at<cv::Vec3b>(pixelEstimated) = cv::Vec3b(0,255,0);
-        image.at<cv::Vec3b>(pixelSimulated) = cv::Vec3b(0,0,255);
+
+        image.at<cv::Vec3b>(pixelEstimated) = cv::Vec3b(0, 255, 0);
+        image.at<cv::Vec3b>(pixelSimulated) = cv::Vec3b(0, 0, 255);
     }
 
-    LOG_MESSAGE(P);
-    LOG_MESSAGE(P1);
-    
-    mu::drawImage(image, "k");
-    
-    return 0;
-    
+    mu::drawImage(image, "Image");
+
     // Excercise 2 - Camera calibration using homographies
+
     /***************
      * Excersise 3**
      ***************
@@ -144,39 +142,34 @@ int main() {
             descriptors2,
             keypoints1,
             keypoints2);
-    //    std::vector<cv::DMatch> matchPoints = mu::matching(img1,
-    //            img2,
-    //            "FlannBased",
-    //            descriptors1,
-    //            descriptors2,
-    //            keypoints1,
-    //            keypoints2);
-    std::vector<std::vector<cv::DMatch> > matches;
-    cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(10, 10, 2), new cv::flann::SearchParams(50));
-    matcher.knnMatch(descriptors1, descriptors2, matches, 2);
+    
+    std::vector<cv::DMatch> matchPoints = mu::matching(img1,
+            img2,
+            "FlannBased",
+            descriptors1,
+            descriptors2,
+            keypoints1,
+            keypoints2);
 
     /**
      * ***********************************************
      *  3.b FindFundamentalMat using 8 points RANSAC *
      * ***********************************************
      **/
-
-    std::vector<cv::DMatch> goodMatchs;
     std::vector<cv::Point2f> points1, points2;
-    for (i = 0; i < matches.size(); i++) {
-        cv::DMatch m, n;
-        m = matches.at(i).at(0);
-        n = matches.at(i).at(1);
-        if (m.distance < 0.8 * n.distance) {
-            goodMatchs.push_back(m);
-            points2.push_back(keypoints2.at(m.trainIdx).pt);
-            points1.push_back(keypoints1.at(m.queryIdx).pt);
-        }
+    for (i = 0; i < matchPoints.size(); i++) {
+        points1.push_back(keypoints1.at(matchPoints.at(i).queryIdx).pt);
+        points2.push_back(keypoints2.at(matchPoints.at(i).trainIdx).pt);
     }
 
     // Leave defaults params for ransac, 3 and .99
     cv::Mat mask;
     cv::Mat F = cv::findFundamentalMat(points1, points2, mask, CV_FM_8POINT + CV_FM_RANSAC);
+
+    std::cout << "F Matrix" << std::endl;
+    std::cout << F << std::endl;
+    std::cout << "Press enter to show next exercise result" << std::endl;
+    std::cin.get();
 
     /***************************
      * 3.c Draw epipolar lines *
@@ -234,7 +227,7 @@ int main() {
             descriptors2,
             keypoints1,
             keypoints2);
-    std::vector<cv::DMatch> matchPoints = mu::matching(img0,
+    matchPoints = mu::matching(img0,
             img1,
             "FlannBased",
             descriptors1,
@@ -245,18 +238,31 @@ int main() {
     points1.clear();
     points2.clear();
 
-    for (i = 0; i < matchPoints.size() && i < 1000; i++) {
+    for (i = 0; i < matchPoints.size() && i < 200; i++) {
         points1.push_back(keypoints1[matchPoints.at(i).queryIdx].pt);
         points2.push_back(keypoints2[matchPoints.at(i).trainIdx].pt);
     }
-
     /**
      * 4.c: Compute E and motion
      */
     // First we need to compute F
     F = cv::findFundamentalMat(points1, points2, CV_FM_8POINT + CV_FM_RANSAC);
     // Now we proceed to compute E
-    //    cv::Mat E = K1.t() * F * K0;
+    cv::Mat E = K[1].t() * F * K[0];
+    cv::Matx33d W(0, -1, 0, 1, 0, 0, 0, 0, 1);
+    cv::SVD svd(E, cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
+    E = svd.u * cv::Mat(W) * svd.vt;
+    svd(E, cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
+    // Now 4 solutions are posible, only one is feasible
+    std::vector<cv::Mat> Rr, tt;
+    Rr.push_back(svd.u * cv::Mat(W) * svd.vt); // U W V^T
+    Rr.push_back(svd.u * cv::Mat(W).t() * svd.vt); // U W^T V^T
+    tt.push_back(svd.u.col(2)); // +u3
+    tt.push_back(-svd.u.col(2)); // -u3
+
+    // Search for the feasible solution
+
+
 
     return 0;
 }

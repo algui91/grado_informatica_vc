@@ -148,7 +148,7 @@ std::vector<cv::Mat> mu::drawEpipolarLines(cv::Mat &img1, cv::Mat &img2,
     std::vector<cv::Point2f>::const_iterator it1 = p1.begin();
     std::vector<cv::Point2f>::const_iterator it2 = p2.begin();
 
-    for (int i = 0; it2 != p2.end() && it1 != p1.end() && i < 20 && i < lines.rows; ++it1, ++it2, i++) {
+    for (int i = 0; it2 != p2.end() && it1 != p1.end() && i < 200 && i < lines.rows; ++it1, ++it2, i++) {
         //        cv::Point2f item1 = (*it1);
         //        cv::Point2f item2 = (*it2);
 
@@ -202,10 +202,7 @@ void mu::pintaMI(const std::vector<cv::Mat> &m) {
             x += item.cols;
         }
 
-        cv::namedWindow("Epipolar Lines", cv::WINDOW_AUTOSIZE);
-        cv::imshow("Epipolar Lines", result);
-        cv::waitKey(0);
-        cv::destroyWindow("Epipolar Lines");
+        drawImage(result, "Epipolar Lines");
     }
 }
 
@@ -348,10 +345,10 @@ cv::Mat mu::dlt(const std::vector<cv::Mat_<double> > &points3D, const std::vecto
         *p++ = -(p2D.y * p3D.val[2]);
         *p++ = -p2D.y;
     }
-    
+
     cv::SVD svd(A, cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
     cv::Mat Hn = svd.vt.row(11).reshape(0, 3); // H12
-    
+
     return Hn;
 }
 
@@ -359,7 +356,7 @@ void mu::drawImage(cv::Mat &m, std::string windowName) {
     if (!m.empty()) {
         cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
         cv::imshow(windowName, m);
-        cv::waitKey(0);
+        cv::waitKey();
         cv::destroyWindow(windowName);
     }
 }
