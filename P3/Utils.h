@@ -96,6 +96,7 @@ namespace mu {
 
     void string2double(std::string string, std::vector<double> &numbers);
 
+    cv::Mat dlt(const std::vector<cv::Mat_<double> > &points3D, const std::vector<cv::Mat_<double> > &points2D);
     /**
      * Shows a list of images
      * @param m list of images to show. If they are of different types, all are 

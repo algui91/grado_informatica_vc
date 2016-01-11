@@ -10,6 +10,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/calib3d.hpp>
+#include <opencv2/highgui.hpp>
 
 #include "Utils.h"
 #include "../P2/Utils.h"
@@ -35,27 +36,36 @@ int main() {
      * 1.a - Estimate a finite camera matrix P from a set of random points in [0,1] *
      ********************************************************************************/
     cv::Mat P = mu::estimatePMatrix();
+    std::cout << "Matrix P " << P << std::endl;
     /******************************************************************************************
      * 1.b - Let be a 3D set of points (0,x1,x2) y (x2,x1,0), for x1=0.1:0.1:1 and x2=0.1:0.1:1 *
      ******************************************************************************************/
-    std::vector<cv::Mat> points;
+    std::vector<cv::Mat_<double> > points3D;
 
     for (double k = .1; k <= 1; k += .1) {
         for (double k2 = .1; k2 <= 1; k2 += .1) {
-            points.push_back((cv::Mat_<double>(4,1) << 0, k, k2, 1));
-            points.push_back((cv::Mat_<double>(4,1) << k2, k, 0, 1));
+            points3D.push_back((cv::Mat_<double>(4, 1) << 0, k, k2, 1));
+            points3D.push_back((cv::Mat_<double>(4, 1) << k2, k, 0, 1));
         }
     }
-    
+
     /*******************************************************************
      * 1.c - Project the world points into pixels using the computed P *
      *******************************************************************/
+    std::vector<cv::Mat_<double>> points2D;
     std::cout << "Projected points using P: " << std::endl;
-    for (i = 0; i < points.size(); i++) {
-        cv::Mat point = points.at(i);
-        std::cout << P * point << std::endl;
+    for (i = 0; i < points3D.size(); i++) {
+        points2D.push_back(P * points3D.at(i));
+        std::cout << P * points3D.at(i) << std::endl;
     }
 
+    /**
+     * 1.d - Estimate P matrix from 3d points and projections using DLT
+     */
+    cv::Mat P1 = mu::dlt(points3D, points2D);
+    LOG_MESSAGE("P calculada");
+    LOG_MESSAGE(P);
+    return 0;
     // Excercise 2 - Camera calibration using homographies
     /***************
      * Excersise 3**

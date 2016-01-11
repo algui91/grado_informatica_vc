@@ -307,3 +307,51 @@ bool mu::loadFromFile(const std::string file_name, cv::Mat &K, cv::Mat &radial, 
 
     return false;
 }
+
+cv::Mat mu::dlt(const std::vector<cv::Mat_<double> > &points3D, const std::vector<cv::Mat_<double> > &points2D) {
+
+    cv::Mat A(2 * points3D.size(), 12, CV_64F);
+
+    double *p = A.ptr<double>(0);
+
+    //Compute A
+    for (uint i = 0; i < points3D.size(); ++i) {
+        // TODO: Put matrix from theory
+
+        cv::Point3f p3D(points3D.at(i).at<double>(i,0), points3D.at(i).at<double>(i,1), points3D.at(i).at<double>(i,2));
+        cv::Point2f p2D(points2D.at(i).at<double>(i, 0), points2D.at(i).at<double>(i, 1));
+
+        // first row
+        *p++ = p3D.x;
+        *p++ = p3D.y;
+        *p++ = p3D.z;
+        *p++ = 1;
+        *p++ = 0;
+        *p++ = 0;
+        *p++ = 0;
+        *p++ = 0;
+        *p++ = -(p2D.x * p3D.x);
+        *p++ = -(p2D.x * p3D.y);
+        *p++ = -(p2D.x * p3D.z);
+        *p++ = -p2D.x;
+
+        // second row
+        *p++ = 0;
+        *p++ = 0;
+        *p++ = 0;
+        *p++ = 0;
+        *p++ = p3D.x;
+        *p++ = p3D.y;
+        *p++ = p3D.z;
+        *p++ = 1;
+        *p++ = -(p2D.y * p3D.x);
+        *p++ = -(p2D.y * p3D.y);
+        *p++ = -(p2D.y * p3D.z);
+        *p++ = -p2D.y;
+    }
+
+    cv::SVD svd(A, cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
+    cv::Mat Hn = svd.vt.row(11).reshape(0, 3); // H12
+
+    return Hn;
+}
