@@ -129,20 +129,22 @@ int main() {
     std::vector<cv::Mat> chessBoardImages = mu::loadChessboardImages();
 
     cv::Size patternSize(13, 12); // better than 12,13 or 13,12. More valid images
-    std::vector<std::vector<cv::Point2f> > corners(25);
+    std::vector<std::vector<cv::Point2f> > corners;
     bool patternFound[25];
 
     i = 0;
     for (std::vector<cv::Mat>::iterator it = chessBoardImages.begin(); it != chessBoardImages.end(); it++, i++) {
 
-        patternFound[i] = cv::findChessboardCorners(*it, patternSize, corners.at(i),
+        std::vector<cv::Point2f> corner;
+        patternFound[i] = cv::findChessboardCorners(*it, patternSize, corner,
                 cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE);
 
         if (patternFound[i]) {
-            cv::cornerSubPix(*it, corners.at(i), cv::Size(11, 11), cv::Size(-1, -1),
+            cv::cornerSubPix(*it, corner, cv::Size(11, 11), cv::Size(-1, -1),
                     cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
             cv::cvtColor(*it, *it, CV_GRAY2RGB);
-            cv::drawChessboardCorners(*it, patternSize, cv::Mat(corners.at(i)), patternFound[i]);
+            cv::drawChessboardCorners(*it, patternSize, cv::Mat(corner), patternFound[i]);
+            corners.push_back(corner);
         }
     }
 
@@ -158,6 +160,30 @@ int main() {
     /**********************************************
      * 2.b Calibrate camera using the good images *
      **********************************************/
+    cv::Mat cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+    cv::Mat distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+    std::vector<cv::Mat> rvecs, tvecs;
+    std::vector<std::vector<cv::Point3f> > objectPoints(corners.size());
+    
+    for (i = 0; i < corners.size(); i++) {
+        std::vector<cv::Point3f> p;
+        for (int j = 0; j < patternSize.height; j++) {
+            for (int k = 0; k < patternSize.width; k++) {
+                p.push_back(cv::Point3f(float(k),
+                        float(j), 0));
+                LOG_MESSAGE(p.back());
+            }
+        }
+        objectPoints.at(i) = p;
+    }
+ 
+    double rms = cv::calibrateCamera(objectPoints, corners, goodChessBoardImages.at(0).size(), cameraMatrix,
+            distCoeffs, rvecs, tvecs, cv::CALIB_FIX_K4 | cv::CALIB_FIX_K5);
+
+    LOG_MESSAGE(rms);
+    LOG_MESSAGE(cameraMatrix);
+    LOG_MESSAGE(distCoeffs);
+
 
     return 0;
 
