@@ -105,6 +105,8 @@ namespace mu {
     void pintaMI(const std::vector<cv::Mat> &m);
     
     void drawImage(cv::Mat &m, std::string windowName);
+    
+    std::vector<cv::Mat> loadChessboardImages();
 
 }
 #endif	/* UTILS_H */

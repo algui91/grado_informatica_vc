@@ -360,3 +360,22 @@ void mu::drawImage(cv::Mat &m, std::string windowName) {
         cv::destroyWindow(windowName);
     }
 }
+
+std::vector<cv::Mat> mu::loadChessboardImages() {
+    std::vector<cv::Mat> images;
+
+    cv::Mat image;
+    
+    for (int i = 1; i <= 25; i++) {
+        char buffer[23];
+        
+        snprintf(buffer, 23, "./imagenes/Image%d.tif", i);
+        image = cv::imread(buffer, cv::IMREAD_GRAYSCALE);
+       
+        if (!image.empty()){
+            images.push_back(image);
+        }
+    }
+
+    return images;
+}

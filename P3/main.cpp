@@ -11,11 +11,12 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/calib3d.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <vector>
 
 #include "Utils.h"
 
 #define _DEBUG 1
-
 #if _DEBUG
 #define LOG_MESSAGE(x) std::cout << __FILE__ << " (" << __LINE__ << "): " << x << std::endl;
 #else
@@ -117,7 +118,49 @@ int main() {
 
     mu::drawImage(image, "Image");
 
-    // Excercise 2 - Camera calibration using homographies
+    /*******************************************************
+     * Excercise 2 - Camera calibration using homographies *
+     *******************************************************/
+
+    /*******************************
+     *  2.a Findchessboard corners *
+     *******************************/
+
+    std::vector<cv::Mat> chessBoardImages = mu::loadChessboardImages();
+
+    cv::Size patternSize(12, 12); // better than 12,13 or 13,12. More valid images
+    std::vector<std::vector<cv::Point2f> > corners(25);
+    bool patternFound[25];
+
+    i = 0;
+    for (std::vector<cv::Mat>::iterator it = chessBoardImages.begin(); it != chessBoardImages.end(); it++, i++) {
+
+        patternFound[i] = cv::findChessboardCorners(*it, patternSize, corners.at(i),
+                CV_CALIB_CB_ADAPTIVE_THRESH + CV_CALIB_CB_NORMALIZE_IMAGE
+                + CV_CALIB_CB_FAST_CHECK + CV_CALIB_CB_FILTER_QUADS);
+
+        if (patternFound[i]) {
+            cv::cornerSubPix(*it, corners.at(i), cv::Size(11, 11), cv::Size(-1, -1),
+                    cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+            cv::cvtColor(*it, *it, CV_GRAY2RGB);
+            cv::drawChessboardCorners(*it, patternSize, cv::Mat(corners.at(i)), patternFound[i]);
+        }
+    }
+    
+    std::vector<cv::Mat> goodChessBoardImages;
+    for (i = 0; i < chessBoardImages.size(); i++) {
+        if (patternFound[i]) {
+            goodChessBoardImages.push_back(chessBoardImages.at(i));
+        }
+    }
+    chessBoardImages.clear();
+    mu::pintaMI(goodChessBoardImages);
+
+    /**********************************************
+     * 2.b Calibrate camera using the good images *
+     **********************************************/
+
+    return 0;
 
     /***************
      * Excersise 3**
@@ -142,7 +185,7 @@ int main() {
             descriptors2,
             keypoints1,
             keypoints2);
-    
+
     std::vector<cv::DMatch> matchPoints = mu::matching(img1,
             img2,
             "FlannBased",
