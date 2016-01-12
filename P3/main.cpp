@@ -128,7 +128,7 @@ int main() {
 
     std::vector<cv::Mat> chessBoardImages = mu::loadChessboardImages();
 
-    cv::Size patternSize(12, 12); // better than 12,13 or 13,12. More valid images
+    cv::Size patternSize(13, 12); // better than 12,13 or 13,12. More valid images
     std::vector<std::vector<cv::Point2f> > corners(25);
     bool patternFound[25];
 
@@ -136,8 +136,7 @@ int main() {
     for (std::vector<cv::Mat>::iterator it = chessBoardImages.begin(); it != chessBoardImages.end(); it++, i++) {
 
         patternFound[i] = cv::findChessboardCorners(*it, patternSize, corners.at(i),
-                CV_CALIB_CB_ADAPTIVE_THRESH + CV_CALIB_CB_NORMALIZE_IMAGE
-                + CV_CALIB_CB_FAST_CHECK + CV_CALIB_CB_FILTER_QUADS);
+                cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE);
 
         if (patternFound[i]) {
             cv::cornerSubPix(*it, corners.at(i), cv::Size(11, 11), cv::Size(-1, -1),
@@ -146,7 +145,7 @@ int main() {
             cv::drawChessboardCorners(*it, patternSize, cv::Mat(corners.at(i)), patternFound[i]);
         }
     }
-    
+
     std::vector<cv::Mat> goodChessBoardImages;
     for (i = 0; i < chessBoardImages.size(); i++) {
         if (patternFound[i]) {
