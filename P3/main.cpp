@@ -164,7 +164,7 @@ int main() {
     cv::Mat distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
     std::vector<cv::Mat> rvecs, tvecs;
     std::vector<std::vector<cv::Point3f> > objectPoints(corners.size());
-    
+
     for (i = 0; i < corners.size(); i++) {
         std::vector<cv::Point3f> p;
         for (int j = 0; j < patternSize.height; j++) {
@@ -176,16 +176,35 @@ int main() {
         }
         objectPoints.at(i) = p;
     }
- 
+
     double rms = cv::calibrateCamera(objectPoints, corners, goodChessBoardImages.at(0).size(), cameraMatrix,
             distCoeffs, rvecs, tvecs, cv::CALIB_FIX_K4 | cv::CALIB_FIX_K5);
 
-    LOG_MESSAGE(rms);
-    LOG_MESSAGE(cameraMatrix);
-    LOG_MESSAGE(distCoeffs);
+    std::cout << "Intrinsic camera parameters:" << std::endl;
+    std::cout << cameraMatrix << std::endl;
+    std::cout << "Press enter to continue" << std::endl;
+    std::cin.get();
+    std::cout << "Final re projection error:" << std::endl;
+    std::cout << rms << std::endl;
+    std::cout << "Press enter to continue" << std::endl;
+    std::cin.get();
+    std::cout << "Distortion Coeff:" << std::endl;
+    std::cout << distCoeffs << std::endl;
+    std::cout << "Press enter to continue" << std::endl;
+    std::cin.get();
 
+    for (i = 0; i < rvecs.size(); i++) {
 
-    return 0;
+        cv::Matx34d Rt(
+            rvecs.at(i).at<double>(0, 0), rvecs.at(i).at<double>(0, 1), rvecs.at(i).at<double>(0, 2), tvecs.at(i).at<double>(0),
+            rvecs.at(i).at<double>(1, 0), rvecs.at(i).at<double>(1, 1), rvecs.at(i).at<double>(1, 2), tvecs.at(i).at<double>(1),
+            rvecs.at(i).at<double>(2, 0), rvecs.at(i).at<double>(2, 1), rvecs.at(i).at<double>(2, 2), tvecs.at(i).at<double>(2));
+        
+        std::cout << "Extrinsic Params for image : " << i << std::endl;
+        std::cout << Rt << std::endl;
+        std::cout << "Press enter to continue" << std::endl;
+        std::cin.get();
+    }
 
     /***************
      * Excersise 3**
