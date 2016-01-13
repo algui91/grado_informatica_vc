@@ -149,9 +149,6 @@ std::vector<cv::Mat> mu::drawEpipolarLines(cv::Mat &img1, cv::Mat &img2,
     std::vector<cv::Point2f>::const_iterator it2 = p2.begin();
 
     for (int i = 0; it2 != p2.end() && it1 != p1.end() && i < 200 && i < lines.rows; ++it1, ++it2, i++) {
-        //        cv::Point2f item1 = (*it1);
-        //        cv::Point2f item2 = (*it2);
-
         cv::Point x = cv::Point(0, -lines.at<cv::Vec3f>(i).val[2] / lines.at<cv::Vec3f>(i).val[1]);
         cv::Point y = cv::Point(img1.cols, -(lines.at<cv::Vec3f>(i).val[2] + lines.at<cv::Vec3f>(i).val[0] * img1.cols)
                 / lines.at<cv::Vec3f>(i).val[1]);

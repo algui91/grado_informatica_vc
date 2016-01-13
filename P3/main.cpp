@@ -338,10 +338,10 @@ int main() {
     svd(E, cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
     // Now 4 solutions are posible, only one is feasible
     std::vector<cv::Mat> Rr, tt;
-    Rr.push_back(svd.u * cv::Mat(W) * svd.vt); // U W V^T
-    Rr.push_back(svd.u * cv::Mat(W).t() * svd.vt); // U W^T V^T
-    tt.push_back(svd.u.col(2)); // +u3
-    tt.push_back(-svd.u.col(2)); // -u3
+    Rr.push_back(svd.u * cv::Mat(W) * svd.vt); 
+    Rr.push_back(svd.u * cv::Mat(W).t() * svd.vt);
+    tt.push_back(svd.u.col(2));
+    tt.push_back(-svd.u.col(2));
 
     // Search for the feasible solution
 
