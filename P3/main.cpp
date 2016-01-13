@@ -93,7 +93,7 @@ int main() {
     /****************************************************
      * 1.e - Compute error in estimation with frobenius *
      ****************************************************/
-    double err = cv::norm(P1, CV_L2);
+    double err = abs(mu::frobenius(P1) - mu::frobenius(P));
 
     std::cout << "Frobenius Error" << std::endl;
     std::cout << err << std::endl;
@@ -108,9 +108,6 @@ int main() {
     for (i = 0; i < points2DEstimated.size(); i++) {
         cv::Point pixelEstimated(points2DEstimated.at(i).val[0] * 100, points2DEstimated.at(i).val[1] * 100);
         cv::Point pixelSimulated(points2DSimulated.at(i).val[0] * 100, points2DSimulated.at(i).val[1] * 100);
-
-        LOG_MESSAGE(pixelEstimated);
-        LOG_MESSAGE(pixelSimulated);
 
         image.at<cv::Vec3b>(pixelEstimated) = cv::Vec3b(0, 255, 0);
         image.at<cv::Vec3b>(pixelSimulated) = cv::Vec3b(0, 0, 255);
@@ -194,7 +191,6 @@ int main() {
     std::cin.get();
 
     for (i = 0; i < rvecs.size(); i++) {
-
         cv::Matx34d Rt(
             rvecs.at(i).at<double>(0, 0), rvecs.at(i).at<double>(0, 1), rvecs.at(i).at<double>(0, 2), tvecs.at(i).at<double>(0),
             rvecs.at(i).at<double>(1, 0), rvecs.at(i).at<double>(1, 1), rvecs.at(i).at<double>(1, 2), tvecs.at(i).at<double>(1),

@@ -365,17 +365,29 @@ std::vector<cv::Mat> mu::loadChessboardImages() {
     std::vector<cv::Mat> images;
 
     cv::Mat image;
-    
+
     for (int i = 1; i <= 25; i++) {
         char buffer[23];
-        
+
         snprintf(buffer, 23, "./imagenes/Image%d.tif", i);
         image = cv::imread(buffer, cv::IMREAD_GRAYSCALE);
-       
-        if (!image.empty()){
+
+        if (!image.empty()) {
             images.push_back(image);
         }
     }
 
     return images;
+}
+
+double mu::frobenius(cv::Mat &A) {
+    double val = 0;
+    double total = 0;
+    for (int i = 0; i < A.rows; i++) {
+        for (int j = 0; j < A.cols; j++) {
+            val = val + A.at<double>(i, j) * A.at<double>(i, j);
+        }
+        total += val;
+    }
+    return sqrt(total);
 }

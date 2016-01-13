@@ -108,6 +108,7 @@ namespace mu {
     
     std::vector<cv::Mat> loadChessboardImages();
 
+    double frobenius(cv::Mat &A);
 }
 #endif	/* UTILS_H */
 
